@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+
+    /* মেনু বাটন */
+    .menu-btn{
+      position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;
+      font-size:28px;width:56px;height:56px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;z-index:9999;box-shadow:0 10px 30px rgba(0,212,255,0.6);
+      backdrop-filter:blur(12px);border:4px solid rgba(255,255,255,0.3);
+      transition:0.4s;animation:pulse 3s infinite;
+    }
+    .menu-btn:hover{transform:scale(1.15);background:#00b0ff}
+    @keyframes pulse{0%,100%{box-shadow:0 10px 30px rgba(0,212,255,0.6)}50%{box-shadow:0 15px 50px rgba(0,212,255,0.9)}}
+
+    /* স্মার্ট ড্রয়ার মেনু */
+    .drawer{
+      position:fixed;top:0;left:-320px;width:300px;height:100%;background:rgba(255,255,255,0.98);
+      border-right:6px solid #00d4ff;transition:0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index:9999;padding:90px 20px 30px;overflow-y:auto;
+      box-shadow:10px 0 50px rgba(0,0,0,0.6);backdrop-filter:blur(20px);
+    }
+    .drawer a{
+      display:block;padding:18px 25px;color:#00aaff;font-size:19px;font-weight:900;
+      text-decoration:none;border-bottom:1px solid #eee;transition:0.3s;
+      border-radius:12px;margin:8px 10px;position:relative;overflow:hidden;
+    }
+    .drawer a:hover{
+      background:#00d4ff;color:#fff;transform:translateX(12px);
+      box-shadow:0 8px 25px rgba(0,212,255,0.4);
+    }
+    .drawer a::before{
+      content:"";position:absolute;top:50%;left:-50%;width:30%;height:200%;
+      background:linear-gradient(90deg,transparent,#ffffff40,transparent);
+      transform:translateY(-50%) rotate(25deg);transition:0.6s;opacity:0;
+    }
+    .drawer a:hover::before{left:120%;opacity:1}
+
+    .close-btn{
+      position:absolute;top:18px;right:18px;font-size:42px;cursor:pointer;
+      color:#00d4ff;background:#fff;width:50px;height:50px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 20px rgba(0,0,0,0.3);z-index:10;
+    }
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.94);display:none;z-index:9998;
+      backdrop-filter:blur(8px);
+    }
+
+    /* অ্যাডমিন লিংক */
+    .admin-link{background:#ff1744 !important;color:#fff !important;font-weight:900 !important}
+    .admin-link:hover{background:#d50000 !important}
+  </style>
+</head>
+<body>
+
+<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
+<canvas id="spaceBg"></canvas>
+
+<!-- মেনু বাটন -->
+<div class="menu-btn" onclick="openMenu()">Menu</div>
+
+<!-- স্মার্ট ড্রয়ার মেনু -->
+<div class="drawer" id="drawer">
+  <div class="close-btn" onclick="closeMenu()">X</div>
+  <div id="menuItems"></div>
+</div>
+<div class="overlay" onclick="closeMenu()"></div>
+
+<script>
+const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+
+// মেনু ফাংশন
+function openMenu() {
+  document.getElementById('drawer').style.left = '0';
+  document.querySelector('.overlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  document.getElementById('drawer').style.left = '-320px';
+  document.querySelector('.overlay').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// মেনু আইটেম
+const menuItems = document.getElementById('menuItems');
+const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+let html = '';
+
+if (isLoggedIn || isAdmin) {
+  html = `
+    <a href="dashboard.html">ড্যাশবোর্ড</a>
+    <a href="random-tasks.html">Random Tasks</a>
+    <a href="regular-tasks.html">রেগুলার টাক্স</a>
+    <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+    <a href="refer.html">আমার রেফার</a>
+    <a href="passbook.html">পাসবুক</a>
+    <a href="packages.html">প্যাকেজ কিনুন</a>
+    <a href="withdraw.html">উইথড্র</a>
+    <a href="profile.html">প্রোফাইল</a>
+    ${isAdmin ? '<a href="admin.html" class="admin-link">Admin Panel</a>' : ''}
+    <a href="#" onclick="logout()" style="color:#c00;margin-top:20px">লগআউট</a>
+  `;
+} else {
+  html = `
+    <a href="index.html">হোম</a>
+    <a href="login.html">লগইন</a>
+    <a href="register.html">রেজিস্ট্রেশন</a>
+    <a href="about.html">আমাদের সম্পর্কে</a>
+    <a href="contact.html">যোগাযোগ</a>
+  `;
+}
+
+menuItems.innerHTML = html;
+
+// লগআউট
+function logout() {
+  if(confirm('সত্যিই লগআউট করবেন?')) {
+    localStorage.clear();
+    alert('লগআউট সফল!');
+    location.href = 'index.html';
+  }
+}
+
+// লাইভ স্পেস ব্যাকগ্রাউন্ড
+const canvas = document.getElementById('spaceBg');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const stars = [];
+for(let i=0; i<1500; i++){
+  stars.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    size: Math.random()*2.8,
+    speed: Math.random()*1.3 + 0.4
+  });
+}
+let nebulaAngle = 0;
+const planet = {x: w*0.78, y: h*0.22, radius: 110};
+
+function draw(){
+  ctx.fillStyle = 'rgba(0,0,20,0.04)';
+  ctx.fillRect(0,0,w,h);
+
+  // নেবুলা
+  ctx.save();
+  ctx.translate(w/2, h/2);
+  ctx.rotate(nebulaAngle);
+  const g = ctx.createRadialGradient(0,0,0,0,0,900);
+  g.addColorStop(0,'rgba(100,150,255,0.4)');
+  g.addColorStop(0.5,'rgba(60,100,220,0.25)');
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(-1300,-1300,2600,2600);
+  ctx.restore();
+  nebulaAngle += 0.0007;
+
+  // গ্রহ
+  const pg = ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
+  pg.addColorStop(0,'#f8f8ff');
+  pg.addColorStop(0.7,'#aaa');
+  pg.addColorStop(1,'#444');
+  ctx.fillStyle = pg;
+  ctx.beginPath();
+  ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2);
+  ctx.fill();
+
+  // তারা
+  ctx.fillStyle = '#fff';
+  stars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+    ctx.fill();
+    s.x -= s.speed;
+    if(s.x < 0) s.x = w;
+  });
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+window.addEventListener('resize', () => {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>

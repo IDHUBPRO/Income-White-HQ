@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <title>আমার রেফার - Income White HQ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 6px 20px rgba(0,212,255,0.6)}
+    .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #00d4ff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto}
+    .drawer a{display:block;padding:18px 20px;color:#00d4ff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
+    .drawer a:hover{background:#00d4ff;color:#fff}
+    .close-btn{position:absolute;top:15px;right:15px;font-size:35px;cursor:pointer;color:#00d4ff}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;z-index:9998}
+    .header{background:linear-gradient(135deg,#ff9800,#f57c00);color:#fff;padding:25px;text-align:center;font-size:28px;font-weight:bold}
+    .container{max-width:500px;margin:20px auto;padding:20px}
+    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:20px;padding:25px;margin:18px 0;box-shadow:0 15px 40px rgba(255,152,0,0.4);border:3px solid #ff9800;position:relative;overflow:hidden;color:#333}
+    .card::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,#ff980030,transparent);animation:glow 6s linear infinite}
+    @keyframes glow{0%{transform:translateX(-100%) translateY(-100%) rotate(30deg)}100%{transform:translateX(100%) translateY(100%) rotate(30deg)}}
+    .refer-link{background:#fffde7;padding:18px;border-radius:15px;border:2px dashed #ff9800;text-align:center;margin:15px 0;font-size:18px;font-weight:bold;word-break:break-all}
+    .copy-btn{background:#ff9800;color:#fff;padding:12px 25px;border:none;border-radius:12px;cursor:pointer;font-weight:bold;margin:8px;font-size:16px}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+    .stat-box{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;padding:22px;border-radius:15px;text-align:center;box-shadow:0 8px 20px rgba(255,152,0,0.4)}
+    .stat-box h3{font-size:26px;margin:10px 0;font-weight:bold}
+    .refer-item{background:rgba(255,255,255,0.95);padding:18px;margin:12px 0;border-radius:15px;border-left:6px solid #ff9800;box-shadow:0 6px 18px rgba(0,0,0,0.15)}
+    .name{font-size:19px;font-weight:bold;color:#333}
+    .phone{font-size:15px;color:#666;margin:6px 0}
+    .status{padding:6px 16px;border-radius:30px;font-size:14px;font-weight:bold;color:#fff}
+    .free{background:#9e9e9e}
+    .premium{background:#8b3dff}
+    .package{font-size:15px;margin-top:8px;color:#ff9800;font-weight:bold}
+    .no-refer{text-align:center;color:#aaa;padding:50px;font-size:19px}
+  </style>
+</head>
+<body>
+
+<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
+<canvas id="spaceBg"></canvas>
+
+<div class="menu-btn" onclick="openDrawer()">☰</div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">×</div><div id="drawerLinks"></div></div>
+<div class="overlay" onclick="closeDrawer()"></div>
+
+<div class="header">আমার রেফার</div>
+
+<div class="container">
+
+  <div class="card">
+    <h3 style="text-align:center;color:#ff9800;margin-bottom:15px">তোমার রেফার লিংক</h3>
+    <div class="refer-link" id="referLink">লোড হচ্ছে...</div>
+    <button class="copy-btn" onclick="copyLink()">কপি লিংক</button>
+
+    <h3 style="text-align:center;color:#ff9800;margin:25px 0 10px">তোমার রেফার কোড</h3>
+    <div class="refer-link" id="referCode">লোড হচ্ছে...</div>
+    <button class="copy-btn" onclick="copyCode()">কপি কোড</button>
+  </div>
+
+  <div class="card">
+    <div class="stats-grid">
+      <div class="stat-box"><h3 id="totalRefer">0</h3><p>মোট রেফার</p></div>
+      <div class="stat-box"><h3 id="premiumRefer">0</h3><p>প্রিমিয়াম রেফার</p></div>
+      <div class="stat-box"><h3 id="freeRefer">0</h3><p>ফ্রি রেফার</p></div>
+      <div class="stat-box"><h3 id="totalEarned">0</h3><p>রেফার ইনকাম</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="text-align:center;color:#ff9800;margin-bottom:15px">তোমার রেফারকৃত সদস্যগণ</h3>
+    <div id="referList"><div style="text-align:center;padding:40px;color:#ff9800">লোড হচ্ছে...</div></div>
+  </div>
+
+</div>
+
+<script>
+const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+
+if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if(!user.username) { localStorage.clear(); location.href='login.html'; }
+
+// মেনু
+function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
+function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="random-tasks.html">র‍্যান্ডম টাক্স</a>
+  <a href="regular-tasks.html">রেগুলার টাক্স</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="refer.html">আমার রেফার</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="profile.html">প্রোফাইল</a>
+  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}">লগআউট</a>`;
+
+// রেফার লিংক ও কোড
+const baseUrl = location.origin + location.pathname.substring(0, location.pathname.lastIndexOf('/'));
+const referLink = `\( {baseUrl}/register.html?ref= \){encodeURIComponent(user.username)}`;
+const referCode = user.username.toUpperCase();
+
+document.getElementById('referLink').innerText = referLink;
+document.getElementById('referCode').innerText = referCode;
+
+function copyLink(){ navigator.clipboard.writeText(referLink).then(()=>alert('লিংক কপি হয়েছে!')); }
+function copyCode(){ navigator.clipboard.writeText(referCode).then(()=>alert('কোড কপি হয়েছে!')); }
+
+// মাস্ক ফাংশন
+function maskPhone(p){ return p ? p.slice(0,3)+'****'+p.slice(-2) : '****'; }
+function maskEmail(e){ if(!e) return '****'; const [n,d]=e.split('@'); return n.slice(0,3)+'***'+n.slice(-1)+'@'+d; }
+
+async function loadReferrals(){
+  try{
+    const res = await fetch(BASE_URL + "/get_referrals?username=" + user.username);
+    const data = await res.json();
+
+    document.getElementById('totalRefer').innerText = data.total || 0;
+    document.getElementById('premiumRefer').innerText = data.premium || 0;
+    document.getElementById('freeRefer').innerText = (data.total||0) - (data.premium||0);
+    document.getElementById('totalEarned').innerText = (data.refer_earning || 0).toLocaleString() + " HQ";
+
+    const list = document.getElementById('referList');
+    if(!data.referrals || data.referrals.length===0){
+      list.innerHTML = '<div class="no-refer">এখনো কেউ রেফার করেনি<br>লিংক শেয়ার করে আয় শুরু করো!</div>';
+      return;
+    }
+
+    let html = '';
+    data.referrals.forEach(u => {
+      const isPrem = u.is_premium || false;
+      html += `
+        <div class="refer-item">
+          <div class="name">${u.name || 'নাম নেই'}</div>
+          <div class="phone">ফোন: ${maskPhone(u.phone)}</div>
+          <div class="phone">ইমেইল: ${maskEmail(u.email)}</div>
+          <div style="margin-top:10px">
+            <span class="status \( {isPrem?'premium':'free'}"> \){isPrem?'প্রিমিয়াম':'ফ্রি'}</span>
+            <div class="package">${isPrem ? 'প্রিমিয়াম ইউজার' : 'ফ্রি ইউজার'}</div>
+          </div>
+        </div>`;
+    });
+    list.innerHTML = html;
+  } catch(e){
+    document.getElementById('referList').innerHTML = '<div class="no-refer">ইন্টারনেট সমস্যা!</div>';
+  }
+}
+loadReferrals();
+
+// লাইভ স্পেস ব্যাকগ্রাউন্ড
+const canvas = document.getElementById('spaceBg');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const stars = []; for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
+let nebulaAngle = 0;
+const planet = {x:w*0.75,y:h*0.25,radius:90};
+
+function draw(){
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,700);
+  g.addColorStop(0,'rgba(120,0,255,0.35)'); g.addColorStop(0.5,'rgba(80,0,200,0.2)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1000,-1000,2000,2000); ctx.restore(); nebulaAngle+=0.0005;
+  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
+  pg.addColorStop(0,'#ccc'); pg.addColorStop(0.7,'#666'); pg.addColorStop(1,'#222');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
+  requestAnimationFrame(draw);
+}
+draw();
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>

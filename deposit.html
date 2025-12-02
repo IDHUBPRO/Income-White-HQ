@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <title>ডিপোজিট করুন - Income White HQ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+
+    .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;z-index:9999;box-shadow:0 10px 30px rgba(0,212,255,0.6);backdrop-filter:blur(12px)}
+    .drawer{position:fixed;top:0;left:-320px;width:300px;height:100%;background:rgba(255,255,255,0.98);border-right:6px solid #00d4ff;transition:0.5s;z-index:9999;padding:90px 20px 30px;overflow-y:auto;box-shadow:10px 0 50px rgba(0,0,0,0.6)}
+    .drawer a{display:block;padding:18px 25px;color:#00aaff;font-size:19px;font-weight:900;text-decoration:none;border-bottom:1px solid #eee;border-radius:12px;margin:8px 10px;transition:0.3s}
+    .drawer a:hover{background:#00d4ff;color:#fff;transform:translateX(12px)}
+    .close-btn{position:absolute;top:18px;right:18px;font-size:42px;cursor:pointer;color:#00d4ff;background:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 6px 20px rgba(0,0,0,0.4)}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.94);display:none;z-index:9998}
+
+    .header{background:linear-gradient(135deg,#00d4ff,#0066cc);color:#fff;padding:30px;text-align:center;font-size:32px;font-weight:900;box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+    .container{max-width:540px;margin:20px auto;padding:20px}
+
+    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:25px;padding:30px;margin:25px 0;box-shadow:0 20px 50px rgba(0,212,255,0.4);border:4px solid #00d4ff;overflow:hidden}
+    .rate{background:linear-gradient(135deg,#00ff9d,#00d4ff);color:#000;padding:20px;border-radius:18px;text-align:center;font-size:22px;font-weight:900;margin:20px 0;box-shadow:0 15px 40px rgba(0,212,255,0.5)}
+    
+    .input, select, textarea{width:100%;padding:18px;margin:12px 0;border:none;border-radius:15px;background:rgba(255,255,255,0.9);font-size:18px;box-shadow:inset 0 4px 15px rgba(0,0,0,0.1)}
+    select option{background:#fff;color:#333}
+    
+    .btn{background:linear-gradient(135deg,#00d4ff,#00ff9d);color:#000;padding:20px;border:none;border-radius:18px;width:100%;font-size:22px;font-weight:900;cursor:pointer;margin-top:20px;box-shadow:0 12px 35px rgba(0,212,255,0.5);transition:0.4s}
+    .btn:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,212,255,0.7)}
+    
+    .result-box{background:rgba(0,255,150,0.2);padding:20px;border-radius:15px;text-align:center;font-size:24px;font-weight:900;margin:20px 0;border:3px dashed #00ff9d}
+    
+    .history-table{width:100%;border-collapse:collapse;margin-top:20px;background:rgba(255,255,255,0.1);border-radius:15px;overflow:hidden}
+    .history-table th{background:linear-gradient(135deg,#00d4ff,#0066cc);padding:18px;font-size:18px}
+    .history-table td{padding:16px;text-align:center;font-size:17px}
+    .history-table tr:hover{background:rgba(255,255,255,0.15)}
+    .status{padding:8px 18px;border-radius:30px;font-weight:bold;font-size:15px}
+    .pending{background:#fff3cd;color:#856404}
+    .approved{background:#d4edda;color:#155724}
+    .rejected{background:#f8d7da;color:#721c24}
+  </style>
+</head>
+<body>
+
+<!-- স্পেস ব্যাকগ্রাউন্ড -->
+<canvas id="spaceBg"></canvas>
+
+<div class="menu-btn" onclick="openDrawer()">Menu</div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
+<div class="overlay" onclick="closeDrawer()"></div>
+
+<div class="header">ডিপোজিট করুন</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="rate">
+      রেট: ১০০ টাকা = ১,০০০ HQ<br>
+      মিনিমাম: ১০০ টাকা
+    </div>
+
+    <select id="method" class="input">
+      <option value="">পেমেন্ট মেথড বেছে নিন</option>
+      <option value="bkash">বিকাশ - 01873-115394 (Personal)</option>
+      <option value="nagad">নগদ - 01873-115394 (Personal)</option>
+      <option value="rocket">রকেট - 01577-213347 (Personal)</option>
+      <option value="upay">উপায় - 01873-115394</option>
+    </select>
+
+    <input type="number" id="amount" class="input" placeholder="কত টাকা পাঠাবে? (উদা: 500)" min="100">
+
+    <div class="result-box">
+      তুমি পাবে: <span id="hqAmount" style="color:#00ff9d;font-size:28px">0</span> HQ
+    </div>
+
+    <input type="text" id="trxid" class="input" placeholder="ট্রানজেকশন আইডি লিখো (TrxID)">
+    <input type="text" id="sender" class="input" placeholder="তোমার নাম্বার (যে নাম্বার থেকে পাঠিয়েছো)">
+
+    <textarea class="input" id="proof" rows="4" placeholder="স্ক্রিনশট লিংক দাও → Imgur.com / Google Drive / Telegram সেভ করো"></textarea>
+
+    <button class="btn" onclick="submitDeposit()">ডিপোজিট রিকোয়েস্ট পাঠাও</button>
+  </div>
+
+  <div class="card">
+    <h3 style="text-align:center;margin-bottom:20px;font-size:24px;color:#00d4ff">ডিপোজিট হিস্ট্রি</h3>
+    <div id="historyList" style="text-align:center;color:#aaa;font-size:18px">লোড হচ্ছে...</div>
+  </div>
+
+</div>
+
+<script>
+const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+
+if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+// মেনু
+function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';document.body.style.overflow='hidden';}
+function closeDrawer(){document.getElementById('sideDrawer').style.left='-320px';document.querySelector('.overlay').style.display='none';document.body.style.overflow='auto';}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="random-tasks.html">Random Tasks</a>
+  <a href="regular-tasks.html">রেগুলার টাক্স</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="refer.html">আমার রেফার</a>
+  <a href="passbook.html">পাসবুক</a>
+  <a href="packages.html">প্যাকেজ কিনুন</a>
+  <a href="deposit.html">ডিপোজিট</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="profile.html">প্রোফাইল</a>
+  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}">লগআউট</a>`;
+
+// রেট ক্যালকুলেটর
+document.getElementById('amount').addEventListener('input', function(){
+  const taka = parseInt(this.value) || 0;
+  const hq = taka * 10;
+  document.getElementById('hqAmount').innerText = hq.toLocaleString();
+});
+
+// ডিপোজিট সাবমিট
+async function submitDeposit(){
+  const method = document.getElementById('method').value;
+  const taka = parseInt(document.getElementById('amount').value);
+  const hq = taka * 10;
+  const trxid = document.getElementById('trxid').value.trim();
+  const sender = document.getElementById('sender').value.trim();
+  const proof = document.getElementById('proof').value.trim();
+
+  if(!method || taka < 100 || !trxid || !sender || !proof){
+    return alert('সবকিছু পূরণ করুন! মিনিমাম ১০০ টাকা');
+  }
+
+  try {
+    const res = await fetch(BASE_URL + "/submit_deposit", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        user_id: user.id,
+        method: method,
+        taka: taka,
+        hq: hq,
+        trxid: trxid,
+        sender_number: sender,
+        proof_link: proof
+      })
+    });
+
+    if(res.ok){
+      alert('ডিপোজিট রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে!\nএডমিন ৫-৩০ মিনিটের মধ্যে যাচাই করে দেবে');
+      document.getElementById('amount').value = '';
+      document.getElementById('trxid').value = '';
+      document.getElementById('sender').value = '';
+      document.getElementById('proof').value = '';
+      loadHistory();
+    } else {
+      alert('সমস্যা হয়েছে! আবার চেষ্টা করুন');
+    }
+  } catch(e) {
+    alert('ইন্টারনেট সমস্যা!');
+  }
+}
+
+// হিস্ট্রি লোড
+async function loadHistory(){
+  try {
+    const res = await fetch(BASE_URL + "/get_deposit_history?user_id=" + user.id);
+    const history = await res.json();
+
+    const list = document.getElementById('historyList');
+    if(history.length === 0){
+      list.innerHTML = '<p style="padding:30px;color:#aaa">কোনো ডিপোজিট রিকোয়েস্ট নেই</p>';
+      return;
+    }
+
+    let html = `<table class="history-table">
+      <tr><th>তারিখ</th><th>পরিমাণ</th><th>HQ</th><th>স্ট্যাটাস</th></tr>`;
+    
+    history.reverse().forEach(d => {
+      const statusClass = d.status;
+      const statusText = d.status === 'pending' ? 'পেন্ডিং' : d.status === 'approved' ? 'এপ্রুভড' : 'রিজেক্টেড';
+      html += `<tr>
+        <td>${new Date(d.created_at).toLocaleDateString('bn-BD')}</td>
+        <td>${d.taka} টাকা</td>
+        <td>${d.hq.toLocaleString()} HQ</td>
+        <td><span class="status \( {statusClass}"> \){statusText}</span></td>
+      </tr>`;
+    });
+    html += `</table>`;
+    list.innerHTML = html;
+  } catch(e) {
+    document.getElementById('historyList').innerHTML = '<p style="color:#f00">ইন্টারনেট সমস্যা!</p>';
+  }
+}
+
+loadHistory();
+
+// স্পেস ব্যাকগ্রাউন্ড
+const canvas = document.getElementById('spaceBg');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const stars = []; for(let i=0;i<1500;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.8,speed:Math.random()*1.3+0.4});
+let nebulaAngle = 0;
+const planet = {x:w*0.75,y:h*0.25,radius:100};
+
+function draw(){
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,800);
+  g.addColorStop(0,'rgba(0,212,255,0.45)'); g.addColorStop(0.5,'rgba(0,150,200,0.3)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore(); nebulaAngle+=0.0006;
+  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
+  pg.addColorStop(0,'#f0f0f0'); pg.addColorStop(0.7,'#888'); pg.addColorStop(1,'#333');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
+  requestAnimationFrame(draw);
+}
+draw();
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>

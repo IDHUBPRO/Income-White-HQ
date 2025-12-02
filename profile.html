@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <title>আমার প্রোফাইল - Income White HQ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 8px 25px rgba(0,212,255,0.6)}
+    .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #00d4ff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto}
+    .drawer a{display:block;padding:18px 22px;color:#00d4ff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
+    .drawer a:hover{background:#00d4ff;color:#fff}
+    .close-btn{position:absolute;top:15px;right:15px;font-size:38px;cursor:pointer;color:#00d4ff}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;z-index:9998}
+    .header{background:linear-gradient(135deg,#8b3dff,#00d4ff);color:#fff;padding:28px;text-align:center;font-size:30px;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+    .container{max-width:520px;margin:20px auto;padding:20px}
+    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(15px);border-radius:25px;padding:30px;margin:20px 0;box-shadow:0 20px 50px rgba(139,61,255,0.4);border:4px solid #8b3dff;position:relative;overflow:hidden;color:#333}
+    .card::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,#8b3dff30,transparent);animation:glow 6s linear infinite}
+    @keyframes glow{0%{transform:translateX(-100%) translateY(-100%) rotate(30deg)}100%{transform:translateX(100%) translateY(100%) rotate(30deg)}}
+    .profile-pic{width:130px;height:130px;border-radius:50%;object-fit:cover;border:6px solid #8b3dff;margin:0 auto 25px;display:block;box-shadow:0 12px 35px rgba(139,61,255,0.5)}
+    .input, .textarea{width:100%;padding:16px;margin:12px 0;border:2px solid #ddd;border-radius:14px;font-size:17px;background:#fff}
+    .input:disabled{background:#f5f0ff;color:#555;opacity:0.9}
+    .btn{background:#8b3dff;color:#fff;padding:18px;border:none;border-radius:16px;width:100%;font-size:20px;font-weight:bold;cursor:pointer;margin-top:18px;box-shadow:0 8px 25px rgba(139,61,255,0.4)}
+    .btn-small{background:#00aa00;padding:12px 25px;font-size:16px;border-radius:12px}
+    .section{margin:30px 0;padding:25px;background:rgba(248,245,255,0.95);border-radius:18px;border-left:6px solid #8b3dff}
+    .label{font-weight:bold;color:#555;margin:12px 0 6px;display:block;font-size:16px}
+    .flex{display:flex;gap:15px;align-items:center}
+    .success{background:#d4edda;color:#155724;padding:16px;border-radius:12px;margin:15px 0;text-align:center;font-weight:bold}
+    .error{background:#ffe6e6;color:#c00;padding:16px;border-radius:12px;margin:15px 0;text-align:center;font-weight:bold}
+  </style>
+</head>
+<body>
+
+<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
+<canvas id="spaceBg"></canvas>
+
+<div class="menu-btn" onclick="openDrawer()">Menu</div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
+<div class="overlay" onclick="closeDrawer()"></div>
+
+<div class="header">আমার প্রোফাইল</div>
+
+<div class="container">
+
+  <!-- প্রোফাইল পিকচার -->
+  <div class="card" style="text-align:center">
+    <img src="https://via.placeholder.com/130?text=User" alt="Profile" class="profile-pic" id="profilePic">
+    <input type="file" id="picUpload" accept="image/*" style="display:none">
+    <button class="btn" onclick="document.getElementById('picUpload').click()">প্রোফাইল ছবি পরিবর্তন করুন</button>
+  </div>
+
+  <!-- প্রোফাইল ইনফো -->
+  <div class="card">
+    <h3 style="text-align:center;color:#8b3dff;margin-bottom:25px;font-size:24px">প্রোফাইল তথ্য</h3>
+    <div id="updateMsg"></div>
+
+    <div class="label">পূর্ণ নাম</div>
+    <input type="text" id="name" class="input" placeholder="তোমার নাম লিখো">
+
+    <div class="label">ইউজারনেম (পরিবর্তন করা যাবে না)</div>
+    <input type="text" id="username" class="input" disabled>
+
+    <div class="label">ইমেইল</div>
+    <input type="email" id="email" class="input">
+
+    <div class="label">মোবাইল নাম্বার</div>
+    <input type="text" id="phone" class="input">
+
+    <div class="label">হোয়াটসঅ্যাপ নাম্বার (অপশনাল)</div>
+    <input type="text" id="whatsapp" class="input">
+
+    <div class="label">তোমার রেফার কোড</div>
+    <div class="flex">
+      <input type="text" id="referCode" class="input" disabled style="flex:1">
+      <button class="btn-small" onclick="copyCode()">কপি</button>
+    </div>
+
+    <button class="btn" onclick="updateProfile()">প্রোফাইল আপডেট করুন</button>
+  </div>
+
+  <!-- পাসওয়ার্ড পরিবর্তন -->
+  <div class="card section">
+    <h3 style="text-align:center;color:#8b3dff;margin-bottom:25px;font-size:24px">পাসওয়ার্ড পরিবর্তন</h3>
+    <div id="passMsg"></div>
+
+    <div class="label">বর্তমান পাসওয়ার্ড</div>
+    <input type="password" id="oldPass" class="input" placeholder="পুরাতন পাসওয়ার্ড">
+
+    <div class="label">নতুন পাসওয়ার্ড</div>
+    <input type="password" id="newPass1" class="input" placeholder="নতুন পাসওয়ার্ড">
+
+    <div class="label">নতুন পাসওয়ার্ড আবার লিখুন</div>
+    <input type="password" id="newPass2" class="input" placeholder="আবার লিখুন">
+
+    <button class="btn" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন করুন</button>
+  </div>
+
+</div>
+
+<script>
+const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+
+if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+// মেনু
+function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
+function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="random-tasks.html">Random Tasks</a>
+  <a href="regular-tasks.html">রেগুলার টাক্স</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="refer.html">আমার রেফার</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="profile.html">প্রোফাইল</a>
+  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}">লগআউট</a>`;
+
+// প্রোফাইল লোড
+async function loadProfile() {
+  try {
+    const res = await fetch(BASE_URL + "/get_user_profile?user_id=" + user.id);
+    const data = await res.json();
+
+    document.getElementById('name').value = data.name || '';
+    document.getElementById('username').value = data.username || '';
+    document.getElementById('email').value = data.email || '';
+    document.getElementById('phone').value = data.phone || '';
+    document.getElementById('whatsapp').value = data.whatsapp || '';
+    document.getElementById('referCode').value = (data.username || '').toUpperCase();
+
+    if (data.profile_pic) {
+      document.getElementById('profilePic').src = data.profile_pic;
+    }
+  } catch(e) {
+    alert('প্রোফাইল লোড করতে সমস্যা!');
+  }
+}
+
+// প্রোফাইল আপডেট
+async function updateProfile() {
+  const updates = {
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    whatsapp: document.getElementById('whatsapp').value.trim()
+  };
+
+  if (!updates.name || !updates.email || !updates.phone) {
+    return document.getElementById('updateMsg').innerHTML = '<div class="error">নাম, ইমেইল ও ফোন দিতে হবে!</div>';
+  }
+
+  try {
+    const res = await fetch(BASE_URL + "/update_profile", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: user.id, ...updates})
+    });
+    const result = await res.json();
+
+    if(res.ok) {
+      document.getElementById('updateMsg').innerHTML = '<div class="success">প্রোফাইল সফলভাবে আপডেট হয়েছে!</div>';
+      localStorage.setItem('currentUser', JSON.stringify({...user, ...updates}));
+    } else {
+      document.getElementById('updateMsg').innerHTML = `<div class="error">${result.message || 'সমস্যা হয়েছে!'}</div>`;
+    }
+  } catch(e) {
+    document.getElementById('updateMsg').innerHTML = '<div class="error">ইন্টারনেট সমস্যা!</div>';
+  }
+}
+
+// পাসওয়ার্ড চেঞ্জ
+async function changePassword() {
+  const oldPass = document.getElementById('oldPass').value;
+  const new1 = document.getElementById('newPass1').value;
+  const new2 = document.getElementById('newPass2').value;
+
+  if (!oldPass || !new1 || !new2) return alert('সব ফিল্ড পূরণ করো!');
+  if (new1 !== new2) return alert('নতুন পাসওয়ার্ড মিলছে না!');
+  if (new1.length < 6) return alert('নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে!');
+
+  try {
+    const res = await fetch(BASE_URL + "/change_password", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: user.id, old_password: oldPass, new_password: new1})
+    });
+    const data = await res.json();
+
+    if(res.ok) {
+      document.getElementById('passMsg').innerHTML = '<div class="success">পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!</div>';
+      document.getElementById('oldPass').value = document.getElementById('newPass1').value = document.getElementById('newPass2').value = '';
+    } else {
+      document.getElementById('passMsg').innerHTML = `<div class="error">${data.message || 'বর্তমান পাসওয়ার্ড ভুল!'}</div>`;
+    }
+  } catch(e) {
+    document.getElementById('passMsg').innerHTML = '<div class="error">ইন্টারনেট সমস্যা!</div>';
+  }
+}
+
+// ছবি আপলোড
+document.getElementById('picUpload').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    const base64 = ev.target.result;
+    try {
+      const res = await fetch(BASE_URL + "/upload_profile_pic", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: user.id, profile_pic: base64})
+      });
+      if(res.ok) {
+        document.getElementById('profilePic').src = base64;
+        alert('প্রোফাইল ছবি আপডেট হয়েছে!');
+      }
+    } catch(e) { alert('ছবি আপলোড সমস্যা!'); }
+  };
+  reader.readAsDataURL(file);
+});
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById('referCode').value);
+  alert('রেফার কোড কপি হয়েছে!');
+}
+
+loadProfile();
+
+// লাইভ স্পেস ব্যাকগ্রাউন্ড
+const canvas = document.getElementById('spaceBg');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const stars = []; for(let i=0;i<1200;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.5,speed:Math.random()*1+0.3});
+let nebulaAngle = 0;
+const planet = {x:w*0.75,y:h*0.25,radius:100};
+
+function draw(){
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,800);
+  g.addColorStop(0,'rgba(120,0,255,0.4)'); g.addColorStop(0.5,'rgba(80,0,200,0.25)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore(); nebulaAngle+=0.0006;
+  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
+  pg.addColorStop(0,'#f0f0f0'); pg.addColorStop(0.7,'#888'); pg.addColorStop(1,'#333');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
+  requestAnimationFrame(draw);
+}
+draw();
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>

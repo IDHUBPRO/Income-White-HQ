@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <title>প্রিমিয়াম প্যাকেজ কিনুন - Income White HQ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    .header{background:linear-gradient(135deg,#8b3dff,#00d4ff);color:#fff;padding:30px;text-align:center;font-size:32px;font-weight:900;box-shadow:0 12px 40px rgba(0,0,0,0.5);border-radius:0 0 35px 35px}
+    .container{max-width:540px;margin:25px auto;padding:20px}
+    .balance-info{background:rgba(255,255,255,0.95);color:#8b3dff;padding:25px;border-radius:22px;text-align:center;margin:25px 0;font-size:24px;font-weight:900;border:5px solid #8b3dff;box-shadow:0 15px 40px rgba(139,61,255,0.5)}
+    .pkg{background:linear-gradient(135deg,#8b3dff,#00d4ff);color:#fff;padding:32px;border-radius:25px;margin:25px 0;text-align:center;box-shadow:0 20px 50px rgba(139,61,255,0.5);position:relative;overflow:hidden;transform:translateY(0);transition:0.4s}
+    .pkg:hover{transform:translateY(-12px);box-shadow:0 30px 70px rgba(139,61,255,0.7)}
+    .pkg::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,#ffffff20,transparent);animation:glow 7s linear infinite}
+    @keyframes glow{0%{transform:translateX(-100%) translateY(-100%) rotate(30deg)}100%{transform:translateX(100%) translateY(100%) rotate(30deg)}}
+    .price{font-size:42px;font-weight:900;margin:18px 0;letter-spacing:2px}
+    .old-price{text-decoration:line-through;opacity:0.6;font-size:20px}
+    .btn{background:#fff;color:#8b3dff;padding:20px;border:none;border-radius:18px;width:100%;font-size:22px;font-weight:900;cursor:pointer;margin-top:22px;box-shadow:0 10px 30px rgba(0,0,0,0.3);transition:0.3s}
+    .btn:hover{background:#f0f0f0;transform:scale(1.05)}
+    .btn:disabled{background:#999;color:#666;cursor:not-allowed;transform:none}
+    .note{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:18px;border-radius:18px;margin:30px 0;font-size:17px;text-align:center;border:2px dashed rgba(255,255,255,0.4)}
+    .popular{position:relative}
+    .popular::after{content:"সবচেয়ে জনপ্রিয়";position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:#ff1744;color:#fff;padding:8px 20px;border-radius:30px;font-size:16px;font-weight:bold}
+  </style>
+</head>
+<body>
+
+<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
+<canvas id="spaceBg"></canvas>
+
+<div class="header">প্রিমিয়াম প্যাকেজ কিনুন</div>
+
+<div class="container">
+
+  <div class="balance-info">
+    তোমার ডিপোজিট ব্যালেন্স: <span id="depositBal">লোড হচ্ছে...</span> HQ
+  </div>
+
+  <div class="pkg">
+    <h2>সিলভার প্যাকেজ</h2>
+    <div class="price">১,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ২ টি অ্যাড • ১০০ HQ/অ্যাড</p>
+    <button class="btn" onclick="buyPackage(1000, 'সিলভার')">কিনুন</button>
+  </div>
+
+  <div class="pkg">
+    <h2>গোল্ড প্যাকেজ</h2>
+    <div class="price">৫,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ১০ টি অ্যাড • ৫০ HQ × ১০ = ৫০০ HQ/দিন</p>
+    <button class="btn" onclick="buyPackage(5000, 'গোল্ড')">কিনুন</button>
+  </div>
+
+  <div class="pkg popular">
+    <h2>ডায়মন্ড প্যাকেজ</h2>
+    <div class="price">১০,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ২২ টি অ্যাড • ৫০ HQ/অ্যাড</p>
+    <button class="btn" onclick="buyPackage(10000, 'ডায়মন্ড')">কিনুন</button>
+  </div>
+
+  <div class="pkg">
+    <h2>প্লাটিনাম প্যাকেজ</h2>
+    <div class="price">৩০,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ৭০ টি অ্যাড • উচ্চ রিওয়ার୍ড</p>
+    <button class="btn" onclick="buyPackage(30000, 'প্লাটিনাম')">কিনুন</button>
+  </div>
+
+  <div class="pkg">
+    <h2>এলিট প্যাকেজ</h2>
+    <div class="price">৫০,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ৫৫ টি অ্যাড • ১০০ HQ/অ্যাড</p>
+    <button class="btn" onclick="buyPackage(50000, 'এলিট')">কিনুন</button>
+  </div>
+
+  <div class="pkg">
+    <h2>লিজেন্ড প্যাকেজ</h2>
+    <div class="price">১০০,০০০ HQ</div>
+    <p>৩০ দিন • দৈনিক ৬০ টি অ্যাড • ২০০ HQ/অ্যাড</p>
+    <button class="btn" onclick="buyPackage(100000, 'লিজেন্ড')">কিনুন</button>
+  </div>
+
+  <div class="note">
+    প্রিমিয়াম প্যাকেজ শুধুমাত্র <strong>ডিপোজিট ব্যালেন্স</strong> দিয়ে কেনা যায়।<br>
+    মেইন HQ ব্যালেন্স দিয়ে কেনা যাবে না।<br>
+    প্যাকেজ কিনলে পুরাতন মেয়াদের সাথে +৩০ দিন যোগ হবে।
+  </div>
+
+</div>
+
+<script>
+const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+
+if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+// ডিপোজিট ব্যালেন্স লোড
+async function loadDepositBalance() {
+  try {
+    const res = await fetch(BASE_URL + "/get_deposit_balance?user_id=" + user.id);
+    const data = await res.json();
+    document.getElementById('depositBal').innerText = Number(data.deposit_balance || 0).toLocaleString();
+  } catch(e) {
+    document.getElementById('depositBal').innerText = "ইন্টারনেট সমস্যা";
+  }
+}
+
+// প্যাকেজ কেনা
+async function buyPackage(amount, name) {
+  if(!confirm(`\( {name} প্যাকেজ কিনবে?\nমূল্য: \){amount.toLocaleString()} HQ\n(ডিপোজিট ব্যালেন্স থেকে কাটা হবে)`)) return;
+
+  try {
+    const res = await fetch(BASE_URL + "/buy_premium_package", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        user_id: user.id,
+        package_amount: amount,
+        package_name: name
+      })
+    });
+    const result = await res.json();
+
+    if(res.ok) {
+      alert(`অভিনন্দন! \( {name} প্যাকেজ সফলভাবে কেনা হয়েছে!\nনতুন মেয়াদ: \){new Date(result.new_expiry).toLocaleDateString('bn-BD')} পর্যন্ত`);
+      
+      // লোকাল ইউজার আপডেট
+      const updatedUser = {...user, 
+        is_premium: true,
+        premium_package: amount,
+        premium_expiry: result.new_expiry,
+        deposit_balance: result.new_deposit_balance
+      };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      loadDepositBalance();
+      setTimeout(() => location.href = 'premium-tasks.html', 1500);
+    } else {
+      alert(result.message || "সমস্যা হয়েছে!");
+    }
+  } catch(e) {
+    alert("ইন্টারনেট সমস্যা!");
+  }
+}
+
+loadDepositBalance();
+
+// লাইভ স্পেস ব্যাকগ্রাউন্ড
+const canvas = document.getElementById('spaceBg');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const stars = []; 
+for(let i=0;i<1400;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.8,speed:Math.random()*1.2+0.4});
+let nebulaAngle = 0;
+const planet = {x:w*0.75,y:h*0.25,radius:110};
+
+function draw(){
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,900);
+  g.addColorStop(0,'rgba(139,61,255,0.45)'); g.addColorStop(0.5,'rgba(100,0,220,0.3)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1300,-1300,2600,2600); ctx.restore(); nebulaAngle+=0.0007;
+  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
+  pg.addColorStop(0,'#f0f0f0'); pg.addColorStop(0.7,'#999'); pg.addColorStop(1,'#444');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
+  requestAnimationFrame(draw);
+}
+draw();
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>
