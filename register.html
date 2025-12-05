@@ -6,24 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html, body {height: auto !important; min-height: 100vh; overflow-y: auto !important; -webkit-overflow-scrolling: touch; padding: 20px 0 120px 0;}
-    body {font-family: 'Segoe UI', Arial, sans-serif; background: #0a001f; color: #fff; position: relative;}
-    canvas {position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;}
-    .container {max-width: 420px; margin: 20px auto; padding: 20px;}
-    .box {background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); border-radius: 25px; padding: 35px 30px; box-shadow: 0 25px 60px rgba(0,212,255,0.4); border: 3px solid #00d4ff; color: #333;}
-    h2 {color: #00d4ff; text-align: center; margin-bottom: 30px; font-size: 32px; font-weight: 900;}
-    input {width: 100%; padding: 18px; margin: 12px 0; border: 2px solid #ddd; border-radius: 15px; font-size: 17px; background: #fff; transition: 0.3s;}
-    input:focus {border-color: #00d4ff; outline: none; box-shadow: 0 0 20px rgba(0,212,255,0.4);}
-    input[readonly] {background: #e8f8ff; color: #0066cc; font-weight: bold;}
-    button {background: linear-gradient(135deg,#00d4ff,#00ff9d); color: #000; padding: 20px; border: none; border-radius: 18px; width: 100%; font-size: 20px; font-weight: 900; margin-top: 25px; cursor: pointer; box-shadow: 0 12px 35px rgba(0,212,255,0.5); transition: 0.4s;}
-    button:hover {transform: translateY(-5px);}
-    button:disabled {background: #999; cursor: not-allowed; transform: none;}
-    .error {color: #ff1744; text-align: center; margin: 15px 0; font-weight: bold; font-size: 17px; padding: 10px; background: rgba(255,23,68,0.1); border-radius: 10px;}
-    .login-link {text-align: center; margin-top: 20px; font-size: 16px;}
-    .login-link a {color: #00d4ff; font-weight: bold; text-decoration: none;}
-    .popup {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;}
-    .popbox {background: #fff; border-radius: 25px; padding: 35px; max-width: 400px; width: 100%; text-align: center; border: 4px solid #00d4ff;}
-    .link {background: #f0f8ff; padding: 18px; border-radius: 15px; margin: 18px 0; word-break: break-all; font-family: monospace; font-size: 15px; color: #0066cc; font-weight: bold;}
+    html, body {height:100%; min-height:100vh; background:#0a001f; font-family:'Segoe UI',Arial,sans-serif; color:#fff; overflow-x:hidden}
+    canvas {position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; opacity:0.7;}
+    .container {max-width:420px; margin:20px auto; padding:20px;}
+    .box {background:rgba(15,15,45,0.95); backdrop-filter:blur(15px); border-radius:25px; padding:35px 30px; box-shadow:0 25px 60px rgba(0,212,255,0.3); border:3px solid #00d4ff; color:#fff;}
+    h2 {color:#00d4ff; text-align:center; margin-bottom:30px; font-size:32px; font-weight:900; text-shadow:0 0 10px #00d4ff;}
+    input {width:100%; padding:18px; margin:12px 0; border:2px solid #00d4ff; border-radius:15px; font-size:17px; background:#1a1a40; color:#fff; transition:0.3s;}
+    input:focus {border-color:#00ff9d; outline:none; box-shadow:0 0 20px rgba(0,255,157,0.5);}
+    input[readonly] {background:#112240; color:#00ff9d; font-weight:bold;}
+    button {background:linear-gradient(135deg,#00d4ff,#00ff9d); color:#000; padding:20px; border:none; border-radius:18px; width:100%; font-size:20px; font-weight:900; margin-top:25px; cursor:pointer; box-shadow:0 12px 35px rgba(0,212,255,0.5); transition:0.4s;}
+    button:hover {transform:translateY(-5px);}
+    button:disabled {background:#555; cursor:not-allowed;}
+    .error {color:#ff3366; text-align:center; margin:15px 0; font-weight:bold; font-size:17px; padding:12px; background:rgba(255,51,102,0.15); border-radius:12px; border:1px solid #ff3366;}
+    .login-link {text-align:center; margin-top:20px; font-size:16px;}
+    .login-link a {color:#00d4ff; font-weight:bold; text-decoration:none;}
+    .popup {position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:9999; padding:20px;}
+    .popbox {background:#0f0f2e; border-radius:25px; padding:35px; max-width:400px; width:100%; text-align:center; border:4px solid #00d4ff; box-shadow:0 0 40px rgba(0,212,255,0.6);}
+    .link {background:#112240; padding:18px; border-radius:15px; margin:18px 0; word-break:break-all; font-family:monospace; font-size:15px; color:#00ff9d; font-weight:bold;}
   </style>
 </head>
 <body>
@@ -55,26 +54,32 @@
 <!-- সাকসেস পপআপ -->
 <div class="popup" id="success">
   <div class="popbox">
-    <h3 style="color:#00d4ff;margin-bottom:20px;font-size:26px">অভিনন্দন!<br>রেজিস্ট্রেশন সফল!</h3>
-    <p style="margin-bottom:15px;font-size:17px">তোমার লগইন তথ্য:</p>
+    <h3 style="color:#00d4ff;">অভিনন্দন!<br>রেজিস্ট্রেশন সফল!</h3>
+    <p style="margin-bottom:15px;">তোমার লগইন তথ্য:</p>
     <div class="link" id="loginInfo"></div>
-    <p style="margin:25px 0 15px;font-size:17px">তোমার রেফার লিংক:</p>
+    <p style="margin:25px 0 15px;">তোমার রেফার লিংক:</p>
     <div class="link" id="myRefLink"></div>
-    <button onclick="copyLink()" style="background:#00d4ff;color:#fff;padding:14px;border-radius:12px;margin:10px;font-size:17px;font-weight:bold;width:100%">রেফার লিংক কপি করুন</button>
-    <button onclick="goDashboard()" style="background:#8b3dff;color:#fff;padding:18px;border-radius:15px;margin-top:15px;font-size:19px;font-weight:900;width:100%">ড্যাশবোর্ডে যান</button>
+    <button onclick="copyLink()" style="background:#00d4ff;color:#fff;padding:14px;border-radius:12px;margin:10px;font-weight:bold;">রেফার লিংক কপি করুন</button>
+    <button onclick="goDashboard()" style="background:#8b3dff;color:#fff;padding:18px;border-radius:15px;margin-top:15px;font-weight:900;">ড্যাশবোর্ডে যান</button>
   </div>
 </div>
 
+<!-- Appwrite SDK -->
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
 <script>
-// তোমার Xano URL — ১০০% ঠিক
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+// তোমার Appwrite প্রজেক্ট
+const client = new Appwrite.Client();
+client
+    .setEndpoint('https://sgp.cloud.appwrite.io/v1')
+    .setProject('6931024b0037bd66bcb4');
 
-// রেফার কোড URL থেকে লোড
+const databases = new Appwrite.Databases(client);
+const DATABASE_ID = 'main';
+const COLLECTION_ID = 'users';
+
 const urlParams = new URLSearchParams(window.location.search);
 const urlRef = urlParams.get('ref');
-if (urlRef) {
-  document.getElementById('refCode').value = urlRef.toLowerCase();
-}
+if (urlRef) document.getElementById('refCode').value = urlRef.toLowerCase();
 
 async function register() {
   const msg = document.getElementById('msg');
@@ -90,58 +95,65 @@ async function register() {
   const email = document.getElementById('email').value.trim();
   const pass = document.getElementById('pass').value;
   const cpass = document.getElementById('cpass').value;
-  const refer_code = document.getElementById('refCode').value.trim() || null;
+  const refer_by = document.getElementById('refCode').value.trim() || null;
 
-  // ভ্যালিডেশন
   if (!firstName || !lastName || !phone || !username || !pass || !cpass) {
     msg.innerHTML = 'সব * চিহ্নিত ফিল্ড পূরণ করো!';
     btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return;
   }
   if (pass !== cpass) { msg.innerHTML = 'পাসওয়ার্ড মিলছে না!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
-  if (pass.length < 6) { msg.innerHTML = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
-  if (!/^01[0-9]{9}$/.test(phone)) { msg.innerHTML = 'সঠিক ১১ ডিজিটের মোবাইল নাম্বার দাও!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
+  if (pass.length < 6) { msg.innerHTML = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
+  if (!/^01[0-9]{9}$/.test(phone)) { msg.innerHTML = 'সঠিক ১১ ডিজিটের নাম্বার দাও!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
 
   try {
-    const response = await fetch(BASE_URL + "/Register_User", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: username,
-        phone: phone,
-        first_name: firstName,    // তোমার Xano-তে যদি first_name ফিল্ড থাকে
-        last_name: lastName,      // যদি last_name থাকে
-        email: email || null,
-        password: pass,           // যদি password ফিল্ড থাকে
-        refer_code: refer_code
-      })
+    // ডুপ্লিকেট চেক
+    const check = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Appwrite.Query.or([
+        Appwrite.Query.equal('username', username),
+        Appwrite.Query.equal('phone', phone)
+      ])
+    ]);
+    if (check.total > 0) {
+      msg.innerHTML = 'ইউজারনেম বা ফোন নাম্বার আগে থেকে আছে!';
+      btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return;
+    }
+
+    // রেজিস্ট্রেশন
+    const response = await databases.createDocument(DATABASE_ID, COLLECTION_ID, 'unique()', {
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      username,
+      email: email || null,
+      password: pass,
+      refer_by: refer_by,
+      new_balance: 50,
+      deposit_balance: 0,
+      task_balance: 0,
+      random_balance: 0,
+      refer_balance: refer_by ? 100 : 0,
+      premium_balance: 0,
+      task_completed: 0,
+      task_rejected: 0
     });
 
-    const result = await response.json();
+    localStorage.setItem('currentUser', JSON.stringify(response));
+    localStorage.setItem('isLoggedIn', 'true');
 
-    if (response.ok && result.success === true) {
-      // সাকসেস হলে
-      localStorage.setItem('authToken', result.token || '');
-      localStorage.setItem('currentUser', JSON.stringify(result.user || result));
-      localStorage.setItem('isLoggedIn', 'true');
+    const baseUrl = location.origin + location.pathname.split('/').slice(0, -1).join('/') + '/';
+    const referLink = `\( {baseUrl}register.html?ref= \){username}`;
 
-      const baseUrl = location.origin + location.pathname.split('/').slice(0, -1).join('/') + '/';
-      const referLink = `\( {baseUrl}register.html?ref= \){username}`;
+    document.getElementById('loginInfo').innerHTML = `
+      ইউজারনেম: <b>${username}</b><br>
+      পাসওয়ার্ড: <b>${pass}</b><br>
+      নাম: <b>\( {firstName} \){lastName}</b>
+    `;
+    document.getElementById('myRefLink').innerText = referLink;
+    document.getElementById('success').style.display = 'flex';
 
-      document.getElementById('loginInfo').innerHTML = `
-        ইউজারনেম: <b>${username}</b><br>
-        পাসওয়ার্ড: <b>${pass}</b><br>
-        নাম: <b>\( {firstName} \){lastName}</b>
-      `;
-      document.getElementById('myRefLink').innerText = referLink;
-      document.getElementById('success').style.display = 'flex';
-
-    } else {
-      msg.innerHTML = result.message || "ইউজারনেম বা ফোন নাম্বার আগে থেকে রেজিস্টার করা আছে!";
-      btn.disabled = false;
-      btn.innerText = 'রেজিস্টার করুন';
-    }
   } catch (err) {
-    msg.innerHTML = 'ইন্টারনেট সমস্যা বা সার্ভার ডাউন! আবার চেষ্টা করো।';
+    msg.innerHTML = err.message || 'সমস্যা হয়েছে! আবার চেষ্টা করো।';
+  } finally {
     btn.disabled = false;
     btn.innerText = 'রেজিস্টার করুন';
   }
@@ -149,37 +161,36 @@ async function register() {
 
 function copyLink() {
   const link = document.getElementById('myRefLink').innerText;
-  navigator.clipboard.writeText(link).then(() => alert('রেফার লিংক কপি হয়েছে!'));
+  navigator.clipboard.writeText(link).then(() => alert('রেফার লিংক কপি হয়েছে!'));
 }
 
 function goDashboard() {
   location.href = 'dashboard.html';
 }
 
-// স্পেস ব্যাকগ্রাউন্ড অ্যানিমেশন
+// সুন্দর স্পেস ব্যাকগ্রাউন্ড (ডার্ক + ক্লিয়ার)
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
 const stars = [];
-for(let i=0; i<1200; i++) stars.push({x:Math.random()*w, y:Math.random()*h, size:Math.random()*2.5, speed:Math.random()*1.2+0.3});
-let nebulaAngle = 0;
-const planet = {x:w*0.78, y:h*0.22, radius:110};
+for(let i=0; i<800; i++) stars.push({x:Math.random()*w, y:Math.random()*h, size:Math.random()*2, speed:Math.random()*0.5+0.1});
+let angle = 0;
 
 function draw() {
-  ctx.fillStyle = 'rgba(10,0,30,0.06)'; ctx.fillRect(0,0,w,h);
-  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
-  const grad = ctx.createRadialGradient(0,0,0,0,0,900);
-  grad.addColorStop(0,'rgba(100,0,255,0.5)'); grad.addColorStop(0.5,'rgba(0,212,255,0.3)'); grad.addColorStop(1,'transparent');
-  ctx.fillStyle = grad; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore();
-  nebulaAngle += 0.0006;
-
-  const pg = ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#f0f8ff'); pg.addColorStop(0.7,'#88c'); pg.addColorStop(1,'#226');
-  ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(10,0,30,0.08)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(angle);
+  const grad = ctx.createRadialGradient(0,0,0,0,0,800);
+  grad.addColorStop(0,'rgba(100,0,255,0.3)'); grad.addColorStop(0.6,'rgba(0,212,255,0.2)'); grad.addColorStop(1,'transparent');
+  ctx.fillStyle = grad; ctx.fillRect(-1000,-1000,2000,2000); ctx.restore();
+  angle += 0.0005;
 
   ctx.fillStyle = '#fff';
-  stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill(); s.x -= s.speed; if(s.x < 0) s.x = w; });
+  stars.forEach(s => {
+    ctx.globalAlpha = Math.random()*0.8+0.2;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+    s.x -= s.speed; if(s.x < 0) s.x = w;
+  });
   requestAnimationFrame(draw);
 }
 draw();
