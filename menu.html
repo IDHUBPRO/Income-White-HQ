@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
@@ -68,14 +69,12 @@
 
 <!-- স্মার্ট ড্রয়ার মেনু -->
 <div class="drawer" id="drawer">
-  <div class="close-btn" onclick="closeMenu()">X</div>
+  <div class="close-btn" onclick="closeMenu()">×</div>
   <div id="menuItems"></div>
 </div>
 <div class="overlay" onclick="closeMenu()"></div>
 
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
-
 // মেনু ফাংশন
 function openMenu() {
   document.getElementById('drawer').style.left = '0';
@@ -88,14 +87,12 @@ function closeMenu() {
   document.body.style.overflow = 'auto';
 }
 
-// মেনু আইটেম
-const menuItems = document.getElementById('menuItems');
+// লগইন/লগআউট চেক
 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
 let html = '';
-
-if (isLoggedIn || isAdmin) {
+if (isLoggedIn) {
   html = `
     <a href="dashboard.html">ড্যাশবোর্ড</a>
     <a href="random-tasks.html">Random Tasks</a>
@@ -118,8 +115,7 @@ if (isLoggedIn || isAdmin) {
     <a href="contact.html">যোগাযোগ</a>
   `;
 }
-
-menuItems.innerHTML = html;
+document.getElementById('menuItems').innerHTML = html;
 
 // লগআউট
 function logout() {
@@ -130,13 +126,13 @@ function logout() {
   }
 }
 
-// লাইভ স্পেস ব্যাকগ্রাউন্ড
+// স্পেস ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
 const stars = [];
-for(let i=0; i<1500; i++){
+for(let i=0;i<1500;i++){
   stars.push({
     x: Math.random()*w,
     y: Math.random()*h,
@@ -145,53 +141,25 @@ for(let i=0; i<1500; i++){
   });
 }
 let nebulaAngle = 0;
-const planet = {x: w*0.78, y: h*0.22, radius: 110};
 
 function draw(){
-  ctx.fillStyle = 'rgba(0,0,20,0.04)';
-  ctx.fillRect(0,0,w,h);
-
-  // নেবুলা
-  ctx.save();
-  ctx.translate(w/2, h/2);
-  ctx.rotate(nebulaAngle);
-  const g = ctx.createRadialGradient(0,0,0,0,0,900);
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,900);
   g.addColorStop(0,'rgba(100,150,255,0.4)');
   g.addColorStop(0.5,'rgba(60,100,220,0.25)');
   g.addColorStop(1,'transparent');
-  ctx.fillStyle = g;
-  ctx.fillRect(-1300,-1300,2600,2600);
-  ctx.restore();
-  nebulaAngle += 0.0007;
-
-  // গ্রহ
-  const pg = ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#f8f8ff');
-  pg.addColorStop(0.7,'#aaa');
-  pg.addColorStop(1,'#444');
-  ctx.fillStyle = pg;
-  ctx.beginPath();
-  ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2);
-  ctx.fill();
-
-  // তারা
-  ctx.fillStyle = '#fff';
-  stars.forEach(s => {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
-    ctx.fill();
-    s.x -= s.speed;
-    if(s.x < 0) s.x = w;
+  ctx.fillStyle=g; ctx.fillRect(-1300,-1300,2600,2600); ctx.restore();
+  nebulaAngle+=0.0007;
+  ctx.fillStyle='#fff';
+  stars.forEach(s=>{
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+    s.x-=s.speed; if(s.x<0) s.x=w;
   });
-
   requestAnimationFrame(draw);
 }
 draw();
-
-window.addEventListener('resize', () => {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-});
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
 </script>
 
 </body>

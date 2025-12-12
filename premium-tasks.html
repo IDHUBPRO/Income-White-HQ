@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <title>প্রিমিয়াম টাস্ক - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;position:relative;overflow:hidden;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.7}
     .menu-btn{position:fixed;top:15px;left:15px;background:#8b3dff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 8px 25px rgba(139,61,255,0.6)}
     .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #8b3dff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto}
     .drawer a{display:block;padding:18px 22px;color:#8b3dff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
@@ -22,7 +23,7 @@
     @keyframes glow{0%{transform:translateX(-100%) translateY(-100%) rotate(30deg)}100%{transform:translateX(100%) translateY(100%) rotate(30deg)}}
     .reward{font-size:28px;font-weight:bold;color:#8b3dff;margin:18px 0}
     .btn{background:#8b3dff;color:#fff;padding:18px;border:none;border-radius:16px;width:100%;font-size:20px;font-weight:bold;cursor:pointer;margin-top:15px;box-shadow:0 8px 25px rgba(139,61,255,0.4)}
-    .btn:disabled{background:#666;color:#999;cursor:not-allowed;opacity:0.7}
+    .btn:disabled{background:#666;color:#999;cursor:not-allowed}
     .countdown{font-size:52px;color:#8b3dff;font-weight:900;margin:20px 0}
     .daily{font-size:20px;background:rgba(255,255,255,0.95);color:#8b3dff;padding:18px;border-radius:18px;margin:20px 0;text-align:center;font-weight:bold;border:4px solid #8b3dff}
     .completed{color:#00aa00;font-weight:bold;font-size:19px;margin-top:12px}
@@ -30,11 +31,10 @@
 </head>
 <body>
 
-<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
 <div class="menu-btn" onclick="openDrawer()">Menu</div>
-<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">×</div><div id="drawerLinks"></div></div>
 <div class="overlay" onclick="closeDrawer()"></div>
 
 <div class="header">প্রিমিয়াম টাস্ক</div>
@@ -46,7 +46,7 @@
   </div>
 
   <div class="daily" id="dailyStatus">আজকের অ্যাড: 0 / 0</div>
-  <div id="adList"><div style="text-align:center;padding:40px;color:#8b3dff">লোড হচ্ছে...</div></div>
+  <div id="adList">লোড হচ্ছে...</div>
 </div>
 
 <!-- অ্যাড মোডাল -->
@@ -57,30 +57,12 @@
   <button class="btn" id="completeBtn" disabled>কমপ্লিট করুন</button>
 </div>
 
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+checkLogin();
 
-if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
-const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-
-// প্রিমিয়াম চেক
-if(!user.is_premium || new Date(user.premium_expiry) < new Date()) {
-  alert('তোমার প্রিমিয়াম মেম্বারশিপ নেই বা মেয়াদ শেষ হয়েছে!');
-  location.href='packages.html';
-}
-
-// মেনু
-function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
-function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
-document.getElementById('drawerLinks').innerHTML = `
-  <a href="dashboard.html">ড্যাশবোর্ড</a>
-  <a href="random-tasks.html">Random Tasks</a>
-  <a href="regular-tasks.html">রেগুলার টাক্স</a>
-  <a href="premium-tasks.html">প্রিমিয়াম টাস্ক</a>
-  <a href="refer.html">আমার রেফার</a>
-  <a href="withdraw.html">উইথড্র</a>
-  <a href="profile.html">প্রোফাইল</a>
-  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}">লগআউট</a>`;
+let currentUser = null;
 
 // প্যাকেজ কনফিগ
 const packages = {
@@ -92,39 +74,60 @@ const packages = {
   100000: {name:"লিজেন্ড",    dailyLimit:60, reward:200}
 };
 
-async function loadPremiumData() {
-  try {
-    const res = await fetch(BASE_URL + "/get_premium_status?user_id=" + user.id);
-    const data = await res.json();
+async function init() {
+  currentUser = await getCurrentUser();
+  if (!currentUser) return;
 
-    const pkg = packages[data.premium_package] || packages[1000];
+  if (!currentUser.is_premium || new Date(currentUser.premium_expiry) < new Date()) {
+    showNotification('তোমার প্রিমিয়াম মেম্বারশিপ নেই বা মেয়াদ শেষ!', 'error');
+    setTimeout(() => location.href = 'packages.html', 2000);
+    return;
+  }
+
+  loadPremiumTasks();
+}
+init();
+
+async function loadPremiumTasks() {
+  try {
+    const userDoc = await db.getDocument(DATABASE_ID, COL.users, currentUser.$id);
+    const pkg = packages[userDoc.premium_package] || packages[1000];
+
+    const today = new Date().toISOString().split('T')[0];
+    const logRes = await db.listDocuments(DATABASE_ID, 'premium_ads_log', [
+      Appwrite.Query.equal('user_id', currentUser.$id),
+      Appwrite.Query.equal('date', today)
+    ]);
+
+    const todayCompleted = logRes.total;
+    const remaining = pkg.dailyLimit - todayCompleted;
 
     document.getElementById('packageName').innerText = pkg.name + " প্যাকেজ";
-    document.getElementById('expireInfo').innerText = "মেয়াদ: " + new Date(data.premium_expiry).toLocaleDateString('bn-BD');
-    document.getElementById('dailyStatus').innerText = `আজকের অ্যাড: \( {data.today_completed} / \){pkg.dailyLimit}`;
+    document.getElementById('expireInfo').innerText = "মেয়াদ: " + new Date(userDoc.premium_expiry).toLocaleDateString('bn-BD');
+    document.getElementById('dailyStatus').innerText = `আজকের অ্যাড: \( {todayCompleted} / \){pkg.dailyLimit}`;
 
     const adList = document.getElementById('adList');
-    const remaining = pkg.dailyLimit - data.today_completed;
 
-    if(remaining <= 0){
-      adList.innerHTML = `<div class="ad-card"><h3 style="color:#00aa00">আজকের সব অ্যাড কমপ্লিট!</h3><p>কাল আবার চলে আসো</p></div>`;
-    } else {
-      adList.innerHTML = '';
-      for(let i = 1; i <= remaining; i++){
-        adList.innerHTML += `
-          <div class="ad-card">
-            <h3>প্রিমিয়াম অ্যাড #${i}</h3>
-            <div class="reward">পুরস্কার: ${pkg.reward} HQ</div>
-            <button class="btn" onclick="watchAd(\( {i}, \){pkg.reward})">অ্যাড দেখুন</button>
-          </div>`;
-      }
+    if (remaining <= 0) {
+      adList.innerHTML = `<div class="ad-card"><h3 style="color:#00aa00">আজকের সব অ্যাড কমপ্লিট!</h3><p>কাল আবার এসো</p></div>`;
+      return;
     }
-  } catch(e) {
+
+    adList.innerHTML = '';
+    for (let i = 1; i <= remaining; i++) {
+      adList.innerHTML += `
+        <div class="ad-card">
+          <h3>প্রিমিয়াম অ্যাড #${i}</h3>
+          <div class="reward">পুরস্কার: ${pkg.reward} HQ</div>
+          <button class="btn" onclick="watchAd(\( {i}, \){pkg.reward})">অ্যাড দেখুন</button>
+        </div>`;
+    }
+  } catch (e) {
     document.getElementById('adList').innerHTML = '<div class="ad-card" style="color:#f00">ইন্টারনেট সমস্যা!</div>';
   }
 }
 
-function watchAd(adNumber, reward){
+function watchAd(adNumber, reward) {
   document.getElementById('adFrame').src = "https://youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1";
   document.getElementById('adModal').style.display = 'flex';
 
@@ -132,51 +135,68 @@ function watchAd(adNumber, reward){
   document.getElementById('timer').innerText = time;
   document.getElementById('completeBtn').disabled = true;
 
-  const timer = setInterval(() => {
+  const timer = setInterval(async () => {
     time--;
     document.getElementById('timer').innerText = time;
-    if(time <= 0){
+    if (time <= 0) {
       clearInterval(timer);
       document.getElementById('completeBtn').disabled = false;
       document.getElementById('completeBtn').onclick = async () => {
         try {
-          const res = await fetch(BASE_URL + "/complete_premium_ad", {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({user_id: user.id, reward: reward})
+          const today = new Date().toISOString().split('T')[0];
+          await db.createDocument(DATABASE_ID, 'premium_ads_log', 'unique()', {
+            user_id: currentUser.$id,
+            date: today,
+            reward: reward
           });
-          if(res.ok){
-            alert(`অভিনন্দন! +${reward} HQ যোগ হয়েছে`);
-            document.getElementById('adModal').style.display = 'none';
-            loadPremiumData();
-          }
-        } catch(e) { alert('সমস্যা হয়েছে!'); }
+
+          await db.updateDocument(DATABASE_ID, COL.users, currentUser.$id, {
+            premium_balance: Appwrite.Query.increment(reward),
+            task_balance: Appwrite.Query.increment(reward)
+          });
+
+          showNotification(`অভিনন্দন! +${reward} HQ যোগ হয়েছে`, 'success');
+          document.getElementById('adModal').style.display = 'none';
+          loadPremiumTasks();
+        } catch (e) {
+          showNotification('সমস্যা: ' + e.message, 'error');
+        }
       };
     }
   }, 1000);
 }
 
-loadPremiumData();
+// মেনু
+function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
+function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="random-tasks.html">Random Tasks</a>
+  <a href="regular-tasks.html">রেগুলার টাক্স</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="refer.html">আমার রেফার</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="profile.html">প্রোফাইল</a>
+  <a href="#" onclick="logout()" style="color:#c00">লগআউট</a>
+`;
 
-// লাইভ স্পেস ব্যাকগ্রাউন্ড
+// ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-const stars = []; for(let i=0;i<1200;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.5,speed:Math.random()*1+0.3});
+const stars = [];
+for(let i=0;i<1200;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.5,speed:Math.random()*1+0.3});
 let nebulaAngle = 0;
-const planet = {x:w*0.75,y:h*0.25,radius:100};
-
 function draw(){
   ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
   ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
   const g=ctx.createRadialGradient(0,0,0,0,0,800);
-  g.addColorStop(0,'rgba(139,61,255,0.4)'); g.addColorStop(0.5,'rgba(100,0,200,0.25)'); g.addColorStop(1,'transparent');
-  ctx.fillStyle=g; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore(); nebulaAngle+=0.0006;
-  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#f0f0f0'); pg.addColorStop(0.7,'#888'); pg.addColorStop(1,'#333');
-  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
+  g.addColorStop(0,'rgba(139,61,255,0.4)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore();
+  nebulaAngle += 0.0006;
+  ctx.fillStyle='#fff';
+  stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }
 draw();

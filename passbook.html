@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <title>ইনকাম রিপোর্ট / পাসবুক - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;position:relative;overflow:hidden;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.7}
     .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 8px 25px rgba(0,212,255,0.6)}
     .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #00d4ff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto}
     .drawer a{display:block;padding:18px 22px;color:#00d4ff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
@@ -16,7 +17,7 @@
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;z-index:9998}
     .header{background:linear-gradient(135deg,#00d4ff,#8b3dff);color:#fff;padding:28px;text-align:center;font-size:30px;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
     .container{max-width:580px;margin:20px auto;padding:20px}
-    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(15px);border-radius:25px;padding:28px;margin:20px 0;box-shadow:0 20px 50px rgba(0,212,255,0.4);border:4px solid #00d4ff;overflow:hidden}
+    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(15px);border-radius:25px;padding:28px;margin:20px 0;box-shadow:0 20px 50px rgba(0,212,255,0.4);border:4px solid #00d4ff;overflow:hidden;color:#333}
     .filter{background:rgba(227,242,253,0.95);padding:18px;border-radius:18px;margin-bottom:25px;text-align:center}
     .filter select,.filter button{padding:14px 18px;border-radius:14px;border:none;margin:6px;font-size:17px;font-weight:bold}
     .filter button{background:#00d4ff;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(0,212,255,0.4)}
@@ -43,11 +44,10 @@
 </head>
 <body>
 
-<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
 <div class="menu-btn" onclick="openDrawer()">Menu</div>
-<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">×</div><div id="drawerLinks"></div></div>
 <div class="overlay" onclick="closeDrawer()"></div>
 
 <div class="header">ইনকাম রিপোর্ট / পাসবুক</div>
@@ -58,9 +58,9 @@
     <div class="filter">
       <select id="filterType">
         <option value="all">সব ধরনের লেনদেন</option>
-        <option value="random">রেনডম টাক্স</option>
-        <option value="regular">রেগুলার টাক্স</option>
-        <option value="premium">প্রিমিয়াম টাক্স</option>
+        <option value="random">র‍্যান্ডম টাস্ক</option>
+        <option value="regular">রেগুলার টাস্ক</option>
+        <option value="premium">প্রিমিয়াম টাস্ক</option>
         <option value="refer">রেফার ইনকাম</option>
         <option value="deposit">ডিপোজিট</option>
         <option value="withdraw">উইথড্র</option>
@@ -76,11 +76,19 @@
 
 </div>
 
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+checkLogin();
 
-if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
-const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+let currentUser = null;
+
+async function init() {
+  currentUser = await getCurrentUser();
+  if (!currentUser) return;
+  loadPassbook();
+}
+init();
 
 // মেনু
 function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
@@ -88,84 +96,80 @@ function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px'
 document.getElementById('drawerLinks').innerHTML = `
   <a href="dashboard.html">ড্যাশবোর্ড</a>
   <a href="random-tasks.html">Random Tasks</a>
-  <a href="regular-tasks.html">রেগুলার টাক্স</a>
-  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="regular-tasks.html">রেগুলার টাস্ক</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাস্ক</a>
   <a href="refer.html">আমার রেফার</a>
   <a href="passbook.html">পাসবুক</a>
   <a href="withdraw.html">উইথড্র</a>
   <a href="profile.html">প্রোফাইল</a>
-  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}">লগআউট</a>`;
+  <a href="#" onclick="logout()" style="color:#c00">লগআউট</a>
+`;
 
-// পাসবুক লোড করা
+// পাসবুক লোড
 async function loadPassbook(filter = 'all') {
   try {
-    const res = await fetch(BASE_URL + "/get_transaction_history?user_id=" + user.id);
-    const transactions = await res.json();
+    const res = await db.listDocuments(DATABASE_ID, 'transactions', [
+      Appwrite.Query.equal('user_id', currentUser.$id),
+      Appwrite.Query.orderDesc('$createdAt')
+    ]);
 
-    const filtered = filter === 'all' ? transactions : transactions.filter(t => t.type === filter);
+    let data = res.documents;
+    if (filter !== 'all') {
+      data = data.filter(t => t.type === filter);
+    }
 
-    const tableDiv = document.getElementById('passbookTable');
-    if(filtered.length === 0){
-      tableDiv.innerHTML = '<div class="no-data">কোনো লেনদেন পাওয়া যায়নি</div>';
+    const table = document.getElementById('passbookTable');
+    if (data.length === 0) {
+      table.innerHTML = '<div class="no-data">কোনো লেনদেন পাওয়া যায়নি</div>';
       return;
     }
 
+    const typeBn = {
+      random: 'র‍্যান্ডম', regular: 'রেগুলার', premium: 'প্রিমিয়াম',
+      refer: 'রেফার', deposit: 'ডিপোজিট', withdraw: 'উইথড্র'
+    };
+    const statusBn = {approved: 'এপ্রুভড', pending: 'পেন্ডিং', rejected: 'রিজেক্টেড'};
+
     let html = `<table>
-      <tr>
-        <th>তারিখ</th>
-        <th>ধরন</th>
-        <th>পরিমাণ</th>
-        <th>স্ট্যাটাস</th>
-        <th>বিবরণ</th>
-      </tr>`;
+      <tr><th>তারিখ</th><th>ধরন</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>বিবরণ</th></tr>`;
 
-    const typeBn = {random:'রেনডম',regular:'রেগুলার',premium:'প্রিমিয়াম',refer:'রেফার',deposit:'ডিপোজিট',withdraw:'উইথড্র'};
-    const statusBn = {approved:'এপ্রুভড',pending:'পেন্ডিং',rejected:'রিজেক্টেড'};
-
-    filtered.forEach(t => {
+    data.forEach(t => {
+      const sign = t.amount > 0 ? '+' : '';
       const amountClass = t.amount > 0 ? 'plus' : 'minus';
-      const amountText = t.amount > 0 ? `+${t.amount}` : t.amount;
-
       html += `<tr>
-        <td>${new Date(t.date).toLocaleDateString('bn-BD')}</td>
+        <td>${formatDate(t.$createdAt)}</td>
         <td><span class="type \( {t.type}"> \){typeBn[t.type] || t.type}</span></td>
-        <td class="amount \( {amountClass}"> \){amountText} HQ</td>
+        <td class="amount \( {amountClass}"> \){sign}${t.amount} HQ</td>
         <td><span class="status \( {t.status}"> \){statusBn[t.status] || t.status}</span></td>
         <td>${t.note || '-'}</td>
       </tr>`;
     });
     html += `</table>`;
-    tableDiv.innerHTML = html;
-  } catch(e) {
+    table.innerHTML = html;
+  } catch (e) {
     document.getElementById('passbookTable').innerHTML = '<div class="no-data" style="color:#f00">ইন্টারনেট সমস্যা!</div>';
   }
 }
 
-function applyFilter(){
-  const filter = document.getElementById('filterType').value;
-  loadPassbook(filter);
+function applyFilter() {
+  const type = document.getElementById('filterType').value;
+  loadPassbook(type);
 }
 
-loadPassbook();
-
-// লাইভ স্পেস ব্যাকগ্রাউন্ড
+// ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-const stars = []; for(let i=0;i<1300;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.5,speed:Math.random()*1+0.3});
+const stars = [];
+for(let i=0;i<1300;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2.5,speed:Math.random()*1+0.3});
 let nebulaAngle = 0;
-const planet = {x:w*0.75,y:h*0.25,radius:100};
-
 function draw(){
   ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
   ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
   const g=ctx.createRadialGradient(0,0,0,0,0,800);
   g.addColorStop(0,'rgba(0,212,255,0.4)'); g.addColorStop(0.5,'rgba(0,150,200,0.25)'); g.addColorStop(1,'transparent');
   ctx.fillStyle=g; ctx.fillRect(-1200,-1200,2400,2400); ctx.restore(); nebulaAngle+=0.0006;
-  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#f0f0f0'); pg.addColorStop(0.7,'#888'); pg.addColorStop(1,'#333');
-  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }

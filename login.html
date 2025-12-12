@@ -4,29 +4,30 @@
   <meta charset="utf-8">
   <title>লগইন - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;overflow:hidden}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:'Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;overflow:hidden;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.7}
     .box{background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:20px;padding:40px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,212,255,0.4);border:3px solid #00d4ff;text-align:center}
-    h2{color:#00d4ff;margin-bottom:30px;font-size:28px}
+    h2{color:#00d4ff;margin-bottom:30px;font-size:28px;font-weight:900;text-shadow:0 0 10px #00d4ff}
     input{width:100%;padding:18px;margin:12px 0;border:2px solid #ddd;border-radius:15px;font-size:18px;background:#fff;transition:0.3s}
-    input:focus{border-color:#00d4ff;outline:none}
-    button{background:#00d4ff;color:#fff;padding:18px;border:none;border-radius:15px;width:100%;font-size:19px;font-weight:bold;cursor:pointer;margin-top:20px}
-    button:disabled{background:#999;cursor:not-allowed}
-    .error{color:#c00;margin:15px 0;font-size:16px}
+    input:focus{border-color:#00d4ff;outline:none;box-shadow:0 0 20px rgba(0,212,255,0.4)}
+    button{background:#00d4ff;color:#fff;padding:18px;border:none;border-radius:15px;width:100%;font-size:19px;font-weight:bold;cursor:pointer;margin-top:20px;transition:0.3s}
+    button:hover{background:#00bfff;transform:translateY(-3px)}
+    button:disabled{background:#666;cursor:not-allowed;transform:none}
+    .error,.lockout{color:#ff3366;margin:15px 0;font-size:16px;font-weight:bold;padding:12px;background:rgba(255,51,102,0.1);border-radius:12px;border:1px solid #ff3366;display:none}
     .info{color:#00d4ff;font-size:15px;margin-top:20px}
-    .lockout{color:#c00;font-weight:bold;font-size:18px;margin:10px 0}
+    .register-link a{color:#00d4ff;font-weight:bold;text-decoration:none}
   </style>
 </head>
 <body>
 
-<!-- লাইভ স্পেস + নেবুলা + গ্রহ + তারা ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
 <div class="box">
   <h2>লগইন করুন</h2>
-  <p class="info">ইউজারনেম, ইমেইল অথবা মোবাইল নাম্বার দিন</p>
+  <p class="info">ইউজারনেম, ইমেইল বা মোবাইল দিন</p>
 
   <input type="text" id="identifier" placeholder="ইউজারনেম / ইমেইল / মোবাইল" autocomplete="off" required>
   <input type="password" id="pass" placeholder="পাসওয়ার্ড" autocomplete="off" required>
@@ -36,17 +37,15 @@
 
   <button id="loginBtn" onclick="doLogin()">লগইন করুন</button>
 
-  <p style="margin-top:25px">
-    অ্যাকাউন্ট নেই? <a href="register.html" style="color:#00d4ff;font-weight:bold">রেজিস্ট্রেশন করুন</a>
+  <p class="info register-link">
+    অ্যাকাউন্ট নেই? <a href="register.html">রেজিস্ট্রেশন করুন</a>
   </p>
   <p><a href="index.html" style="color:#666;font-size:14px">হোমে ফিরুন</a></p>
 </div>
 
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-// তোমার Xano Base URL
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
-
-// ব্রুটফোর্স প্রোটেকশন
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 10 * 60 * 1000; // ১০ মিনিট
 
@@ -62,6 +61,7 @@ function isLockedOut(id) {
   if (Date.now() - time < LOCKOUT_TIME) {
     const mins = Math.ceil((LOCKOUT_TIME - (Date.now() - time)) / 60000);
     document.getElementById('lockout').innerText = `অ্যাকাউন্ট লক! ${mins} মিনিট পর আবার চেষ্টা করো।`;
+    document.getElementById('lockout').style.display = 'block';
     document.getElementById('loginBtn').disabled = true;
     return true;
   } else {
@@ -71,24 +71,26 @@ function isLockedOut(id) {
 }
 
 async function doLogin() {
-  {
   const id = document.getElementById('identifier').value.trim();
   const pass = document.getElementById('pass').value;
   const msg = document.getElementById('msg');
   const btn = document.getElementById('loginBtn');
+  msg.style.display = 'none';
+  document.getElementById('lockout').style.display = 'none';
 
-  msg.innerText = '';
-  document.getElementById('lockout').innerText = '';
-
-  if (!id || !pass) return msg.innerText = 'সব ফিল্ড পূরণ করো!';
+  if (!id || !pass) {
+    msg.innerText = 'সব ফিল্ড পূরণ করো!';
+    msg.style.display = 'block';
+    return;
+  }
 
   // সুপার এডমিন
   if (id === "MdEad0" && pass === "admin12345") {
     localStorage.setItem('isAdmin', 'true');
-    localStorage.setItem('currentUser', JSON.stringify({name: "মেইন এডমিন", username: "MdEad0"}));
     localStorage.setItem('isLoggedIn', 'true');
-    alert('স্বাগতম সুপার এডমিন MdEad0 ভাইয়া!');
-    location.href = 'admin.html';
+    localStorage.setItem('currentUser', JSON.stringify({username: "MdEad0", first_name: "মেইন এডমিন"}));
+    showNotification('স্বাগতম সুপার এডমিন MdEad0!', 'success');
+    setTimeout(() => location.href = 'admin.html', 1000);
     return;
   }
 
@@ -98,95 +100,70 @@ async function doLogin() {
   btn.innerText = 'চেক করা হচ্ছে...';
 
   try {
-    const res = await fetch(BASE_URL + "/Login_User", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier: id, password: pass })
-    });
+    const res = await db.listDocuments(DATABASE_ID, COL.users, [
+      Appwrite.Query.or([
+        Appwrite.Query.equal('username', id),
+        Appwrite.Query.equal('email', id),
+        Appwrite.Query.equal('phone', id)
+      ])
+    ]);
 
-    const data = await res.json();
+    if (res.total === 0) throw new Error('ইউজার পাওয়া যায়নি!');
 
-    if (!res.ok || data.error) {
-      // ভুল পাসওয়ার্ড/ইউজার
+    const user = res.documents[0];
+    if (user.password !== pass) {
       let attempts = (JSON.parse(localStorage.getItem(getLockoutKey(id)) || '{"attempts":0}').attempts || 0) + 1;
       localStorage.setItem(getLockoutKey(id), JSON.stringify({attempts, time: Date.now()}));
 
       const left = MAX_ATTEMPTS - attempts;
       if (left > 0) {
-        msg.innerText = `ভুল তথ্য! আর ${left} বার চেষ্টা করতে পারবে।`;
+        msg.innerText = `ভুল পাসওয়ার্ড! আর ${left} বার চেষ্টা করতে পারবে।`;
       } else {
-        msg.innerText = 'অ্যাকাউন্ট লক! ১০ মিনিট পর আবার চেষ্টা করো।';
+        msg.innerText = 'অ্যাকাউন্ট লক! ১০ মিনিট পর চেষ্টা করো।';
         isLockedOut(id);
       }
-    } else {
-      // সফল লগইন
-      localStorage.setItem('currentUser', JSON.stringify(data.user || data));
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.removeItem(getLockoutKey(id));
-      alert('স্বাগতম ' + (data.user?.name || data.user?.username || 'ভাইয়া') + '!');
-      location.href = 'dashboard.html';
+      msg.style.display = 'block';
+      btn.disabled = false;
+      btn.innerText = 'লগইন করুন';
+      return;
     }
+
+    // সফল লগইন
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.removeItem(getLockoutKey(id));
+
+    showNotification(`স্বাগতম ${user.first_name || user.username}!`, 'success');
+    setTimeout(() => location.href = 'dashboard.html', 1000);
+
   } catch (err) {
-    msg.innerText = 'ইন্টারনেট সমস্যা! আবার চেষ্টা করো।';
+    msg.innerText = err.message || 'ভুল তথ্য!';
+    msg.style.display = 'block';
   } finally {
     btn.disabled = false;
     btn.innerText = 'লগইন করুন';
   }
 }
 
-// লাইভ স্পেস ব্যাকগ্রাউন্ড (একই যেটা register.html-এ দিয়েছি)
+// ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-
 const stars = [];
-for(let i=0; i<1000; i++){
-  stars.push({x:Math.random()*w, y:Math.random()*h, size:Math.random()*2, speed:Math.random()*0.8+0.2});
-}
-
+for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
 let nebulaAngle = 0;
-const planet = { x: w*0.75, y: h*0.25, radius: 90 };
-
-function draw() {
-  ctx.fillStyle = 'rgba(0,0,20,0.04)';
-  ctx.fillRect(0,0,w,h);
-
-  // নেবুলা
-  ctx.save();
-  ctx.translate(w/2, h/2);
-  ctx.rotate(nebulaAngle);
-  const grad = ctx.createRadialGradient(0,0,0,0,0,700);
-  grad.addColorStop(0,'rgba(120,0,255,0.35)');
-  grad.addColorStop(0.5,'rgba(80,0,200,0.2)');
-  grad.addColorStop(1,'transparent');
-  ctx.fillStyle = grad;
-  ctx.fillRect(-1000,-1000,2000,2000);
-  ctx.restore();
-  nebulaAngle += 0.0005;
-
-  // গ্রহ
-  const pg = ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#ccc'); pg.addColorStop(0.7,'#666'); pg.addColorStop(1,'#222');
-  ctx.fillStyle = pg;
-  ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
-
-  // তারা
-  ctx.fillStyle = '#fff';
-  stars.forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
-    s.x -= s.speed;
-    if(s.x < 0) s.x = w;
-  });
-
+function draw(){
+  ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
+  ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
+  const g=ctx.createRadialGradient(0,0,0,0,0,700);
+  g.addColorStop(0,'rgba(0,212,255,0.35)'); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.fillRect(-1000,-1000,2000,2000); ctx.restore(); nebulaAngle+=0.0005;
+  ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }
 draw();
-
-window.addEventListener('resize', () => {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-});
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
 </script>
 
 </body>

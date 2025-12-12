@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <title>উইথড্র করুন - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.7}
     .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 6px 20px rgba(0,212,255,0.6)}
     .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #00d4ff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto;box-shadow:5px 0 30px rgba(0,0,0,0.5)}
     .drawer a{display:block;padding:18px 20px;color:#00d4ff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
@@ -20,8 +21,8 @@
     .input, select{width:100%;padding:16px;margin:12px 0;border:2px solid #ddd;border-radius:12px;font-size:17px}
     .btn{background:#00aa00;color:#fff;padding:18px;border:none;border-radius:15px;width:100%;font-size:20px;font-weight:bold;cursor:pointer;margin-top:15px}
     .info{background:#e8f5e8;padding:15px;border-radius:12px;margin:15px 0;text-align:center;font-weight:bold;color:#006400}
-    .calc{background:rgba(240,255,240,0.95);padding:18px;border-radius:15px;margin:20px 0;border:2px dashed #00aa00;color:#333}
-    .calc div{margin:8px 0;font-size:18px}
+    .calc{background:rgba(240,255,240,0.95);padding:18px;border-radius:15px;margin:20px 0;border:2px dashed #00aa00;color:#333;text-align:center}
+    .calc div{margin:10px 0;font-size:18px}
     .red{color:#c00}
     .green{color:#00aa00}
     .history-table{width:100%;border-collapse:collapse;margin-top:20px;background:rgba(255,255,255,0.9);border-radius:12px;overflow:hidden}
@@ -35,10 +36,9 @@
 </head>
 <body>
 
-<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
-<div class="menu-btn" onclick="openDrawer()">☰</div>
+<div class="menu-btn" onclick="openDrawer()">Menu</div>
 <div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">×</div><div id="drawerLinks"></div></div>
 <div class="overlay" onclick="closeDrawer()"></div>
 
@@ -47,22 +47,25 @@
 <div class="container">
 
   <div class="card">
-    <div class="info">কনভার্সন রেট: <strong>১০ HQ = ১ টাকা</strong></div>
+    <div class="info">
+      কনভার্সন রেট: <strong>১০ HQ = ১ টাকা</strong><br>
+      মিনিমাম: র‍্যান্ডম ৫০০০ | রেগুলার ১০০০ | প্রিমিয়াম ৫০০০ | রেফার ১০০০০
+    </div>
 
     <select id="balanceType" class="input">
-      <option value="">ব্যালেন্স টাইপ সিলেক্ট করুন</option>
-      <option value="random">র‍্যান্ডম টাস্ক ব্যালেন্স</option>
-      <option value="regular">রেগুলার টাস্ক ব্যালেন্স</option>
-      <option value="premium">প্রিমিয়াম টাস্ক ব্যালেন্স</option>
-      <option value="refer">রেফার ব্যালেন্স</option>
+      <option value="">ব্যালেন্স টাইপ বেছে নিন</option>
+      <option value="random_balance">র‍্যান্ডম টাস্ক ব্যালেন্স</option>
+      <option value="task_balance">রেগুলার টাস্ক ব্যালেন্স</option>
+      <option value="premium_balance">প্রিমিয়াম টাস্ক ব্যালেন্স</option>
+      <option value="refer_balance">রেফার ব্যালেন্স</option>
     </select>
 
-    <input type="number" id="amount" class="input" placeholder="কত HQ উইথড্র করবে?">
+    <input type="number" id="amount" class="input" placeholder="কত HQ উইথড্র করবে?" min="1000">
 
     <div class="calc" id="calcBox" style="display:none">
-      <div>উইথড্র এমাউন্ট: <strong id="showAmt">0</strong> HQ</div>
+      <div>উইথড্র: <strong id="showAmt">0</strong> HQ</div>
       <div>কমিশন: <span class="red" id="showComm">0</span> HQ</div>
-      <div class="green">তুমি পাবে: <strong id="netAmt">0</strong> HQ = <strong id="takaAmt">0</strong> টাকা</div>
+      <div class="green">পাবে: <strong id="netAmt">0</strong> HQ = <strong id="takaAmt">0</strong> টাকা</div>
     </div>
 
     <select id="method" class="input">
@@ -73,135 +76,177 @@
       <option value="upay">উপায়</option>
     </select>
 
-    <input type="text" id="number" class="input" placeholder="তোমার নাম্বার (যেখানে টাকা পাঠাবো)">
+    <input type="text" id="number" class="input" placeholder="তোমার নাম্বার">
 
     <button class="btn" onclick="submitWithdraw()">উইথড্র রিকোয়েস্ট পাঠাও</button>
   </div>
 
   <div class="card">
     <h3 style="text-align:center;color:#00aa00;margin-bottom:15px">উইথড্র হিস্ট্রি</h3>
-    <div id="historyList"><p style="text-align:center;color:#777">লোড হচ্ছে...</p></div>
+    <div id="historyList">লোড হচ্ছে...</div>
   </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
-if(!localStorage.getItem('isLoggedIn')) location.href='login.html';
-const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+checkLogin(); // লগইন না থাকলে লগইন পেজে পাঠাবে
 
-// মেনু
-function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
-function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
-document.getElementById('drawerLinks').innerHTML = `
-  <a href="dashboard.html">ড্যাশবোর্ড</a>
-  <a href="balance.html">ব্যালেন্স</a>
-  <a href="deposit.html">ডিপোজিট</a>
-  <a href="withdraw.html">উইথড্র</a>
-  <a href="profile.html">প্রোফাইল</a>
-  <a href="#" onclick="localStorage.clear();location.href='index.html'" style="color:#c00">লগআউট</a>
-`;
+const WITHDRAW_COL = 'withdraw_requests';
 
 // কমিশন ও মিনিমাম
-const commission = {random:30, regular:10, premium:20, refer:40};
-const minWithdraw = {random:5000, regular:1000, premium:5000, refer:10000};
+const commission = {random_balance:30, task_balance:10, premium_balance:20, refer_balance:40};
+const minWithdraw = {random_balance:5000, task_balance:1000, premium_balance:5000, refer_balance:10000};
 
-async function loadBalanceAndHistory() {
-  try {
-    const balRes = await fetch(BASE_URL + "/Get_User_Balance_API?user_id=" + user.id);
-    const balData = await balRes.json();
-    const histRes = await fetch(BASE_URL + "/Get_All_Pending_Withdraws");
-    const allWithdraws = await histRes.json();
+let currentUser = null;
 
-    const myWithdraws = allWithdraws.filter(w => w.user_id === user.id);
+async function init() {
+  currentUser = await getCurrentUser();
+  if (!currentUser) return;
+  loadHistory();
+  document.getElementById('amount').addEventListener('input', calculate);
+  document.getElementById('balanceType').addEventListener('change', calculate);
+}
+init();
 
-    // ক্যালকুলেটর আপডেট
-    document.getElementById('amount').addEventListener('input', calculate);
-    document.getElementById('balanceType').addEventListener('change', calculate);
+// ক্যালকুলেট
+function calculate() {
+  const type = document.getElementById('balanceType').value;
+  const amt = parseInt(document.getElementById('amount').value) || 0;
+  const box = document.getElementById('calcBox');
 
-    function calculate() {
-      const type = document.getElementById('balanceType').value;
-      const amt = parseInt(document.getElementById('amount').value) || 0;
-      if(!type || amt === 0) { document.getElementById('calcBox').style.display='none'; return; }
+  if (!type || amt === 0) {
+    box.style.display = 'none';
+    return;
+  }
 
-      const available = balData[type + 'Balance'] || 0;
-      if(amt > available) { alert('ব্যালেন্সে যথেষ্ট HQ নেই!'); document.getElementById('amount').value=''; return; }
-      if(amt < minWithdraw[type]) { alert(`মিনিমাম ${minWithdraw[type]} HQ`); return; }
+  const available = currentUser[type] || 0;
+  if (amt > available) {
+    alert('ব্যালেন্সে যথেষ্ট HQ নেই!');
+    document.getElementById('amount').value = '';
+    box.style.display = 'none';
+    return;
+  }
+  if (amt < minWithdraw[type]) {
+    alert(`এই ব্যালেন্সের মিনিমাম ${minWithdraw[type]} HQ`);
+    box.style.display = 'none';
+    return;
+  }
 
-      const comm = Math.floor(amt * commission[type] / 100);
-      const net = amt - comm;
-      const taka = Math.floor(net / 10);
+  const comm = Math.floor(amt * commission[type] / 100);
+  const net = amt - comm;
+  const taka = Math.floor(net / 10);
 
-      document.getElementById('showAmt').innerText = amt.toLocaleString();
-      document.getElementById('showComm').innerText = comm.toLocaleString() + ' ('+commission[type]+'%)';
-      document.getElementById('netAmt').innerText = net.toLocaleString();
-      document.getElementById('takaAmt').innerText = taka.toLocaleString();
-      document.getElementById('calcBox').style.display = 'block';
-    }
-
-    // হিস্ট্রি দেখাও
-    const list = document.getElementById('historyList');
-    if(myWithdraws.length === 0) {
-      list.innerHTML = '<p style="text-align:center;color:#777">কোনো রিকোয়েস্ট নেই</p>';
-    } else {
-      let html = `<table class="history-table"><tr><th>তারিখ</th><th>HQ</th><th>টাকা</th><th>স্ট্যাটাস</th></tr>`;
-      myWithdraws.reverse().forEach(w => {
-        const statusClass = w.status === 'approved' ? 'approved' : w.status === 'rejected' ? 'rejected' : 'pending';
-        const statusText = w.status === 'pending' ? 'পেন্ডিং' : w.status === 'approved' ? 'পেমেন্ট দেওয়া' : 'রিজেক্টেড';
-        html += `<tr><td>\( {new Date(w.created_at).toLocaleDateString('bn-BD')}</td><td> \){w.amount}</td><td>\( {w.taka}৳</td><td><span class="status \){statusClass}">${statusText}</span></td></tr>`;
-      });
-      html += `</table>`;
-      list.innerHTML = html;
-    }
-  } catch(e) { document.getElementById('historyList').innerHTML = '<p style="color:#c00">ইন্টারনেট সমস্যা!</p>'; }
+  document.getElementById('showAmt').innerText = amt.toLocaleString();
+  document.getElementById('showComm').innerText = comm.toLocaleString() + ' (' + commission[type] + '%)';
+  document.getElementById('netAmt').innerText = net.toLocaleString();
+  document.getElementById('takaAmt').innerText = taka.toLocaleString();
+  box.style.display = 'block';
 }
 
+// উইথড্র সাবমিট
 async function submitWithdraw() {
   const type = document.getElementById('balanceType').value;
   const amount = parseInt(document.getElementById('amount').value);
   const method = document.getElementById('method').value;
   const number = document.getElementById('number').value.trim();
 
-  if(!type || !amount || !method || !number) return alert('সব ফিল্ড পূরণ করো!');
+  if (!type || !amount || !method || !number) {
+    return alert('সবকিছু পূরণ করো!');
+  }
+
+  if (amount < minWithdraw[type]) {
+    return alert(`মিনিমাম ${minWithdraw[type]} HQ`);
+  }
 
   try {
-    const res = await fetch(BASE_URL + "/user_withdraw_request", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({user_id: user.id, type, amount, method, number})
+    await db.createDocument(DATABASE_ID, WITHDRAW_COL, 'unique()', {
+      user_id: currentUser.$id,
+      type,
+      amount,
+      taka: Math.floor((amount - Math.floor(amount * commission[type] / 100)) / 10),
+      method,
+      number,
+      status: 'pending'
     });
-    const data = await res.json();
-    if(res.ok) {
-      alert('উইথড্র রিকোয়েস্ট সফল! এডমিন ২৪-৭২ ঘণ্টার মধ্যে পেমেন্ট করবে।');
-      loadBalanceAndHistory();
-      document.getElementById('amount').value = '';
-      document.getElementById('calcBox').style.display = 'none';
-    } else {
-      alert(data.message || 'কিছু ভুল হয়েছে!');
-    }
-  } catch(e) { alert('ইন্টারনেট সমস্যা!'); }
+
+    showNotification('উইথড্র রিকোয়েস্ট সফল! এডমিন ২৪-৭২ ঘণ্টায় পেমেন্ট করবে', 'success');
+    document.getElementById('amount').value = '';
+    document.getElementById('calcBox').style.display = 'none';
+    loadHistory();
+  } catch (e) {
+    showNotification('সমস্যা: ' + e.message, 'error');
+  }
 }
 
-loadBalanceAndHistory();
+// হিস্ট্রি লোড
+async function loadHistory() {
+  try {
+    const res = await db.listDocuments(DATABASE_ID, WITHDRAW_COL, [
+      Appwrite.Query.equal('user_id', currentUser.$id),
+      Appwrite.Query.orderDesc('$createdAt')
+    ]);
 
-// লাইভ স্পেস ব্যাকগ্রাউন্ড
+    const list = document.getElementById('historyList');
+    if (res.total === 0) {
+      list.innerHTML = '<p style="text-align:center;color:#777">কোনো রিকোয়েস্ট নেই</p>';
+      return;
+    }
+
+    let html = `<table class="history-table">
+      <tr><th>তারিখ</th><th>HQ</th><th>টাকা</th><th>মেথড</th><th>স্ট্যাটাস</th></tr>`;
+    res.documents.forEach(w => {
+      const st = w.status === 'approved' ? 'approved' : w.status === 'rejected' ? 'rejected' : 'pending';
+      const txt = w.status === 'approved' ? 'পেমেন্ট দেওয়া' : w.status === 'rejected' ? 'রিজেক্ট' : 'পেন্ডিং';
+      html += `<tr>
+        <td>${formatDate(w.$createdAt)}</td>
+        <td>${w.amount.toLocaleString()}</td>
+        <td>${w.taka}৳</td>
+        <td>${w.method}</td>
+        <td><span class="status \( {st}"> \){txt}</span></td>
+      </tr>`;
+    });
+    html += `</table>`;
+    list.innerHTML = html;
+  } catch (e) {
+    document.getElementById('historyList').innerHTML = '<p style="color:#c00">ইন্টারনেট সমস্যা!</p>';
+  }
+}
+
+// মেনু
+function openDrawer(){
+  document.getElementById('sideDrawer').style.left='0';
+  document.querySelector('.overlay').style.display='block';
+}
+function closeDrawer(){
+  document.getElementById('sideDrawer').style.left='-300px';
+  document.querySelector('.overlay').style.display='none';
+}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="balance.html">ব্যালেন্স</a>
+  <a href="deposit.html">ডিপোজিট</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="profile.html">প্রোফাইল</a>
+  <a href="#" onclick="logout()" style="color:#c00">লগআউট</a>
+`;
+
+// স্পেস ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-const stars = []; for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
+const stars = [];
+for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
 let nebulaAngle = 0;
-const planet = {x:w*0.75,y:h*0.25,radius:90};
-
 function draw(){
   ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
   ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
   const g=ctx.createRadialGradient(0,0,0,0,0,700);
-  g.addColorStop(0,'rgba(120,0,255,0.35)'); g.addColorStop(0.5,'rgba(80,0,200,0.2)'); g.addColorStop(1,'transparent');
+  g.addColorStop(0,'rgba(0,170,0,0.4)'); g.addColorStop(1,'transparent');
   ctx.fillStyle=g; ctx.fillRect(-1000,-1000,2000,2000); ctx.restore(); nebulaAngle+=0.0005;
-  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#ccc'); pg.addColorStop(0.7,'#666'); pg.addColorStop(1,'#222');
-  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }

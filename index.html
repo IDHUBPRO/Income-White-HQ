@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="utf-8">
@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.85}
 
     /* হেডার */
-    .header{background:rgba(0,212,255,0.95);backdrop-filter:blur(15px);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;width:100%;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-bottom:3px solid #00b0ff}
+    .header{background:rgba(0,212,255,0.95);backdrop-filter:blur(15px);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;width:100%;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-bottom:4px solid #00b0ff}
     .logo{font-size:28px;font-weight:900;letter-spacing:1px;text-shadow:0 3px 10px rgba(0,0,0,0.4)}
     .menu-btn{cursor:pointer;font-size:32px;background:rgba(255,255,255,0.25);padding:10px 14px;border-radius:50%;transition:0.3s}
     .menu-btn:hover{background:rgba(255,255,255,0.4);transform:scale(1.15)}
@@ -25,42 +25,42 @@
     .drawer a:hover::before{left:120%;opacity:1}
     .close-btn{position:absolute;top:18px;right:18px;font-size:42px;cursor:pointer;color:#00d4ff;background:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,0.3)}
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.94);display:none;z-index:9998;backdrop-filter:blur(8px)}
-    .admin-link{background:#ff1744 !important;color:#fff !important}
+    .admin-link{background:#ff1744 !important;color:#fff !important;font-weight:900 !important}
+    .admin-link:hover{background:#d50000 !important}
 
     /* মেইন কনটেন্ট */
-    .main{padding:100px 20px 60px;text-align:center;flex:1}
-    .headline{font-size:34px;font-weight:900;margin:30px 0 20px;line-height:1.4;text-shadow:0 4px 15px rgba(0,0,0,0.5)}
+    .main{padding:100px 20px 80px;text-align:center}
+    .headline{font-size:36px;font-weight:900;margin:30px 0 20px;line-height:1.4;text-shadow:0 4px 15px rgba(0,0,0,0.6)}
     .subhead{font-size:22px;margin:20px 0 40px;opacity:0.95}
-    .points{background:rgba(255,255,255,0.15);backdrop-filter:blur(15px);border-radius:25px;padding:35px 25px;margin:30px 10px;border:3px solid rgba(0,212,255,0.3);box-shadow:0 20px 50px rgba(0,0,0,0.4)}
-    .points li{text-align:left;margin:22px 0;font-size:20px;font-weight:600;display:flex;align-items:center}
-    .points li i{color:#00ff9d;margin-right:18px;font-size:26px}
-    .motivation{background:linear-gradient(135deg,rgba(0,212,255,0.95),rgba(0,150,255,0.95));border-radius:25px;padding:40px;margin:40px 15px;font-size:22px;line-height:1.8;box-shadow:0 20px 50px rgba(0,0,0,0.5);border:3px solid #00ff9d}
-    .social a{background:#fff;color:#00d4ff;padding:22px 30px;margin:15px;border-radius:50px;font-size:20px;text-decoration:none;display:inline-block;width:90%;max-width:340px;box-shadow:0 12px 35px rgba(0,0,0,0.4);font-weight:900;transition:0.4s}
-    .social a:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,0.6);background:#f0f8ff}
-    .social a i{margin-right:15px}
+    .points{background:rgba(255,255,255,0.15);backdrop-filter:blur(15px);border-radius:25px;padding:35px 25px;margin:30px 10px;border:3px solid rgba(0,212,255,0.4);box-shadow:0 20px 50px rgba(0,0,0,0.4)}
+    .points li{text-align:left;margin:25px 0;font-size:21px;font-weight:600;display:flex;align-items:center}
+    .points li i{color:#00ff9d;margin-right:20px;font-size:28px}
+    .motivation{background:linear-gradient(135deg,rgba(0,212,255,0.95),rgba(0,150,255,0.95));border-radius:25px;padding:40px;margin:40px 15px;font-size:23px;line-height:1.8;box-shadow:0 20px 50px rgba(0,0,0,0.5);border:4px solid #00ff9d}
+    .social a{background:#fff;color:#00d4ff;padding:22px 30px;margin:15px;border-radius:50px;font-size:20px;text-decoration:none;display:inline-block;width:90%;max-width:360px;box-shadow:0 12px 35px rgba(0,0,0,0.4);font-weight:900;transition:0.4s}
+    .social a:hover{transform:translateY(-10px);box-shadow:0 25px 60px rgba(0,0,0,0.6);background:#f0f8ff}
+    .social a i{margin-right:18px;font-size:26px}
 
     /* ফুটার */
-    .footer{background:rgba(0,212,255,0.95);color:#fff;padding:25px;text-align:center;font-size:16px;position:fixed;bottom:0;width:100%;backdrop-filter:blur(10px);box-shadow:0 -5px 30px rgba(0,0,0,0.3)}
+    .footer{background:rgba(0,212,255,0.95);color:#fff;padding:25px;text-align:center;font-size:16px;position:fixed;bottom:0;width:100%;backdrop-filter:blur(10px);box-shadow:0 -8px 30px rgba(0,0,0,0.3)}
     .footer a{color:#fff;margin:0 15px;text-decoration:underline;font-weight:bold}
   </style>
 </head>
 <body>
 
-<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
 <!-- হেডার -->
 <div class="header">
   <div class="logo">Income White HQ</div>
-  <div class="menu-btn" onclick="openDrawer()">Menu</div>
+  <div class="menu-btn" onclick="openMenu()">Menu</div>
 </div>
 
 <!-- স্মার্ট ড্রয়ার মেনু -->
 <div class="drawer" id="sideDrawer">
-  <div class="close-btn" onclick="closeDrawer()">X</div>
+  <div class="close-btn" onclick="closeMenu()">×</div>
   <div id="drawerLinks"></div>
 </div>
-<div class="overlay" onclick="closeDrawer()"></div>
+<div class="overlay" onclick="closeMenu()"></div>
 
 <!-- মেইন কনটেন্ট -->
 <div class="main">
@@ -78,7 +78,7 @@
   </div>
 
   <div class="motivation">
-    <strong style="font-size:28px">“যে স্বপ্ন দেখে এবং কাজ করে, তার জন্যই আমরা আছি!”</strong><br><br>
+    <strong style="font-size:30px">“যে স্বপ্ন দেখে এবং কাজ করে, তার জন্যই আমরা আছি!”</strong><br><br>
     এখনই যোগ দিন এবং আপনার স্বপ্ন পূরণ শুরু করুন!<br>
     আমরা আছি আপনার পাশে — সবসময়।
   </div>
@@ -97,8 +97,16 @@
 
 <script>
 // মেনু ফাংশন
-function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';document.body.style.overflow='hidden';}
-function closeDrawer(){document.getElementById('sideDrawer').style.left='-320px';document.querySelector('.overlay').style.display='none';document.body.style.overflow='auto';}
+function openMenu() {
+  document.getElementById('sideDrawer').style.left = '0';
+  document.querySelector('.overlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  document.getElementById('sideDrawer').style.left = '-320px';
+  document.querySelector('.overlay').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
 
 // মেনু লিংক
 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -106,7 +114,7 @@ const isAdmin = localStorage.getItem('isAdmin') === 'true';
 const links = document.getElementById('drawerLinks');
 let menu = '';
 
-if(isLoggedIn || isAdmin){
+if (isLoggedIn) {
   menu = `
     <a href="dashboard.html">ড্যাশবোর্ড</a>
     <a href="random-tasks.html">Random Tasks</a>
@@ -131,7 +139,7 @@ if(isLoggedIn || isAdmin){
 }
 links.innerHTML = menu;
 
-// লাইভ স্পেস ব্যাকগ্রাউন্ড
+// স্পেস ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
@@ -139,7 +147,6 @@ let h = canvas.height = window.innerHeight;
 const stars = [];
 for(let i=0;i<1600;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*3,speed:Math.random()*1.5+0.5});
 let nebulaAngle = 0;
-const planet = {x:w*0.8,y:h*0.2,radius:120};
 
 function draw(){
   ctx.fillStyle='rgba(0,0,20,0.05)'; ctx.fillRect(0,0,w,h);
@@ -147,9 +154,6 @@ function draw(){
   const g=ctx.createRadialGradient(0,0,0,0,0,1000);
   g.addColorStop(0,'rgba(0,212,255,0.5)'); g.addColorStop(0.5,'rgba(0,150,255,0.3)'); g.addColorStop(1,'transparent');
   ctx.fillStyle=g; ctx.fillRect(-1400,-1400,2800,2800); ctx.restore(); nebulaAngle+=0.0007;
-  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#f0f8ff'); pg.addColorStop(0.7,'#88c'); pg.addColorStop(1,'#226');
-  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }

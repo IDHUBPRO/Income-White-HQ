@@ -1,242 +1,189 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8">
-  <title>মেইন এডমিন প্যানেল - Income White HQ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-    body{background:#0a0a1a;color:#fff;min-height:100vh}
-    .header{background:linear-gradient(135deg,#8b3dff,#00d4ff);padding:20px;text-align:center;font-size:28px;font-weight:bold}
-    .container{max-width:1200px;margin:20px auto;padding:20px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-    .card{background:#1a1a2e;border-radius:18px;padding:25px;box-shadow:0 12px 35px rgba(139,61,255,0.4);border:2px solid #8b3dff}
-    .card h3{font-size:22px;margin-bottom:15px;color:#00d4ff}
-    .big-num{font-size:42px;font-weight:bold;color:#8b3dff}
-    .tabs{margin:25px 0;display:flex;flex-wrap:wrap;gap:12px}
-    .tab-btn{background:#333;padding:16px 28px;border:none;border-radius:12px;color:#fff;cursor:pointer;font-size:17px;transition:0.3s}
-    .tab-btn.active{background:#8b3dff;transform:scale(1.05)}
-    .tab-content{display:none;padding:30px;background:#1a1a2e;border-radius:18px;margin-top:15px;box-shadow:inset 0 5px 20px rgba(0,0,0,0.5)}
-    .tab-content.active{display:block}
-    input,select,textarea{width:100%;padding:14px;margin:10px 0;border-radius:10px;border:none;background:#333;color:#fff;font-size:16px}
-    button{background:#8b3dff;color:#fff;padding:14px 24px;border:none;border-radius:10px;cursor:pointer;margin:8px;font-weight:bold}
-    button:hover{background:#9d52ff;transform:translateY(-3px)}
-    .logout-btn{position:fixed;bottom:25px;right:25px;background:#ff4444;padding:18px 30px;border-radius:50px;font-size:18px;font-weight:bold;z-index:999}
-    .login-box,.pin-box{text-align:center;padding:50px;background:#111;border-radius:20px;margin:80px auto;max-width:400px;border:3px solid #8b3dff}
-    .permission-box{background:#222;padding:18px;border-radius:12px;margin:15px 0}
-    .subadmin-card{background:#222;padding:22px;border-radius:15px;margin:15px 0;border-left:6px solid #00d4ff}
-    .welcome-admin{font-size:26px;color:#00d4ff;margin:20px 0;text-align:center;font-weight:bold}
-  </style>
+<meta charset="utf-8">
+<title>মেইন এডমিন প্যানেল - Income White HQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#0a001f;color:#fff;min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#8b3dff,#00d4ff);padding:20px;text-align:center;font-size:28px;font-weight:900;position:relative;overflow:hidden}
+.header::before{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.1) 50%,transparent 70%);animation:shine 6s infinite}
+@keyframes shine{0%{transform:translateX(-100%) translateY(-100%)}100%{transform:translateX(100%) translateY(100%)}}
+.container{max-width:1400px;margin:20px auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:30px}
+.card{background:rgba(255,255,255,0.08);backdrop-filter:blur(15px);border-radius:20px;padding:25px;border:2px solid #8b3dff;box-shadow:0 15px 40px rgba(139,61,255,0.3);text-align:center}
+.card h3{font-size:20px;margin-bottom:12px;color:#00d4ff}
+.big{font-size:44px;font-weight:900;background:linear-gradient(135deg,#8b3dff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tabs{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0;justify-content:center}
+.tab-btn{background:#1a1a2e;padding:16px 30px;border:none;border-radius:15px;color:#fff;cursor:pointer;font-size:18px;font-weight:bold;transition:0.4s}
+.tab-btn.active,.tab-btn:hover{background:#8b3dff;transform:scale(1.05)}
+.tab-content{display:none;padding:35px;background:rgba(255,255,255,0.05);border-radius:20px;backdrop-filter:blur(15px);border:1px solid #8b3dff}
+.tab-content.active{display:block}
+input,select,textarea{width:100%;padding:16px;margin:12px 0;border-radius:12px;background:#1a1a2e;border:1px solid #444;color:#fff;font-size:17px}
+button{background:#8b3dff;color:#fff;padding:16px 32px;border:none;border-radius:12px;cursor:pointer;font-size:18px;font-weight:bold;margin:10px 5px;transition:0.3s}
+button:hover{background:#9d52ff;transform:translateY(-4px);box-shadow:0 10px 30px rgba(139,61,255,0.5)}
+table{width:100%;border-collapse:collapse;margin:20px 0}
+th,td{padding:16px;text-align:center;border-bottom:1px solid #444}
+th{background:#8b3dff;color:#fff}
+.btn-small{padding:8px 16px;font-size:14px}
+.btn-approve{background:#00c853}
+.btn-reject{background:#ff1744}
+.logout{position:fixed;bottom:30px;right:30px;background:#ff1744;padding:20px 35px;border-radius:50px;font-size:20px;z-index:999;cursor:pointer}
+.login-box,.pin-box{max-width:420px;margin:100px auto;padding:50px;background:#111;border-radius:25px;text-align:center;border:3px solid #8b3dff}
+.search-input{max-width:400px;margin:20px auto;display:block;padding:14px;border-radius:12px;background:#1a1a2e;border:1px solid #444;color:#fff;font-size:17px}
+</style>
 </head>
 <body>
 
-<!-- লগইন বক্স -->
+<!-- লগইন -->
 <div class="login-box" id="loginBox">
-  <h2 style="color:#8b3dff;margin-bottom:30px">মেইন এডমিন লগইন</h2>
+  <h2 style="color:#8b3dff">মেইন এডমিন লগইন</h2>
   <input type="text" id="adminUser" placeholder="ইউজারনেম" value="MdEad0"><br>
   <input type="password" id="adminPass" placeholder="পাসওয়ার্ড" value="admin12345"><br>
-  <button onclick="adminLogin()" style="width:100%;padding:18px;font-size:20px;margin-top:20px">লগইন করুন</button>
-  <p style="margin-top:20px;color:#aaa;font-size:14px">ডিফল্ট: MdEad0 / admin12345</p>
+  <button onclick="adminLogin()" style="width:100%;padding:18px;font-size:20px;margin-top:20px">লগইন</button>
 </div>
 
-<!-- পিন বক্স -->
+<!-- পিন -->
 <div class="pin-box" id="pinBox" style="display:none">
-  <h2 style="color:#8b3dff">৬ ডিজিট সিকিউরিটি পিন</h2>
-  <input type="password" id="adminPin" maxlength="6" placeholder="১১২২৩৩" style="text-align:center;font-size:24px;letter-spacing:10px">
+  <h2 style="color:#8b3dff">৬ ডিজিট পিন</h2>
+  <input type="password" id="adminPin" maxlength="6" placeholder="১১২২৩৩" style="text-align:center;font-size:28px;letter-spacing:12px"><br>
   <button onclick="checkPin()" style="width:100%;padding:18px;font-size:20px;margin-top:20px">প্রবেশ করুন</button>
 </div>
 
 <!-- মেইন প্যানেল -->
 <div class="container" id="mainPanel" style="display:none">
-  <div class="welcome-admin">স্বাগতম, সুপ্রিম এডমিন <b>MdEad0</b></div>
-  <div class="header">Income White HQ - মেইন এডমিন প্যানেল</div>
+  <div class="header">Income White HQ — মেইন এডমিন প্যানেল</div>
+  <div style="text-align:center;font-size:28px;color:#00d4ff;margin:20px">স্বাগতম, সুপ্রিম এডমিন <b>MdEad0</b></div>
 
   <div class="grid">
-    <div class="card"><h3>মোট ইউজার</h3><div class="big-num" id="totalUsers">0</div></div>
-    <div class="card"><h3>প্রিমিয়াম ইউজার</h3><div class="big-num" id="premiumUsers">0</div></div>
-    <div class="card"><h3>আজকের নিবন্ধন</h3><div class="big-num" id="todayUsers">0</div></div>
-    <div class="card"><h3>সাব-এডমিন</h3><div class="big-num" id="totalSubAdmins">0</div></div>
-    <div class="card"><h3>পেন্ডিং টাস্ক</h3><div class="big-num" id="pendingTasks">0</div></div>
-    <div class="card"><h3>অ্যাকটিভ নোটিশ</h3><div class="big-num" id="activeNotices">0</div></div>
+    <div class="card"><h3>মোট ইউজার</h3><div class="big" id="totalUsers">0</div></div>
+    <div class="card"><h3>প্রিমিয়াম</h3><div class="big" id="premiumUsers">0</div></div>
+    <div class="card"><h3>পেন্ডিং ডিপোজিট</h3><div class="big" id="pendingDep">0</div></div>
+    <div class="card"><h3>পেন্ডিং উইথড্র</h3><div class="big" id="pendingWd">0</div></div>
+    <div class="card"><h3>পেন্ডিং টাস্ক</h3><div class="big" id="pendingTask">0</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="openTab('dashboard')">ড্যাশবোর্ড</button>
-    <button class="tab-btn" onclick="openTab('subadmin')">সাব-এডমিন ম্যানেজ</button>
+    <button class="tab-btn active" onclick="openTab('dash')">ড্যাশবোর্ড</button>
     <button class="tab-btn" onclick="openTab('users')">ইউজার ম্যানেজ</button>
+    <button class="tab-btn" onclick="openTab('deposit')">ডিপোজিট অ্যাপ্রুভ</button>
+    <button class="tab-btn" onclick="openTab('withdraw')">উইথড্র অ্যাপ্রুভ</button>
     <button class="tab-btn" onclick="openTab('tasks')">টাস্ক অ্যাপ্রুভ</button>
-    <button class="tab-btn" onclick="openTab('notice')">নোটিশ কন্ট্রোল</button>
-    <button class="tab-btn" onclick="openTab('finance')">ফাইন্যান্স</button>
-    <button class="tab-btn" onclick="openTab('logs')">লগ সিস্টেম</button>
+    <button class="tab-btn" onclick="openTab('notice')">নোটিস পুশ</button>
   </div>
 
-  <!-- সাব-এডমিন সেকশন -->
-  <div id="subadmin" class="tab-content">
-    <h2 style="text-align:center;color:#8b3dff;margin-bottom:25px">নতুন সাব-এডমিন তৈরি করুন</h2>
-    <input type="text" id="saName" placeholder="নাম লিখুন">
-    <input type="text" id="saUsername" placeholder="ইউজারনেম (লগইন)">
-    <input type="password" id="saPass" placeholder="পাসওয়ার্ড">
-
-    <div class="permission-box">
-      <strong>ক্ষমতা দিন:</strong><br>
-      <label><input type="checkbox" id="p_users"> ইউজার দেখা/ব্যান</label><br>
-      <label><input type="checkbox" id="p_tasks"> টাস্ক অ্যাপ্রুভ</label><br>
-      <label><input type="checkbox" id="p_notice"> নোটিশ পুশ</label><br>
-      <label><input type="checkbox" id="p_finance"> ব্যালেন্স এডজাস্ট</label><br>
-      <label><input type="checkbox" id="p_logs"> লগ দেখা</label>
-    </div>
-    <button onclick="createSubAdmin()" style="width:100%;padding:18px;font-size:19px">সাব-এডমিন তৈরি করুন</button>
-
-    <h3 style="margin-top:40px;color:#00d4ff">বর্তমান সাব-এডমিন লিস্ট</h3>
-    <div id="subAdminList"></div>
+  <div id="dash" class="tab-content active">
+    <h2 style="text-align:center;color:#8b3dff">সবকিছু তোমার হাতে!</h2>
   </div>
 
-  <!-- অন্যান্য ট্যাব -->
-  <div id="dashboard" class="tab-content active">
-    <h2 style="text-align:center;color:#8b3dff">তুমি এখন পুরো সিস্টেমের মালিক!</h2>
-    <p style="text-align:center;font-size:20px;margin-top:20px">সাব-এডমিন তৈরি করো, ইউজার কন্ট্রোল করো — সব তোমার হাতে!</p>
+  <div id="users" class="tab-content">
+    <input type="text" class="search-input" placeholder="ইউজারনেম/ফোন সার্চ" oninput="searchUser(this.value)">
+    <div id="userList">লোড হচ্ছে...</div>
   </div>
 
-  <div id="users" class="tab-content"><h2 style="color:#00d4ff">ইউজার ম্যানেজমেন্ট — শিগগিরই আসছে...</h2></div>
-  <div id="tasks" class="tab-content"><h2 style="color:#00d4ff">টাস্ক অ্যাপ্রুভ — শিগগিরই...</h2></div>
-  <div id="notice" class="tab-content"><h2 style="color:#00d4ff">নোটিশ পুশ — শিগগিরই...</h2></div>
-  <div id="finance" class="tab-content"><h2 style="color:#00d4ff">HQ এডজাস্ট — শিগগিরই...</h2></div>
-  <div id="logs" class="tab-content"><h2 style="color:#00d4ff">লগ সিস্টেম — শিগগিরই...</h2></div>
+  <div id="deposit" class="tab-content"><div id="depList">লোড হচ্ছে...</div></div>
+  <div id="withdraw" class="tab-content"><div id="wdList">লোড হচ্ছে...</div></div>
+  <div id="tasks" class="tab-content"><div id="taskList">লোড হচ্ছে...</div></div>
 
-  <a href="index.html" class="logout-btn" onclick="logout()">লগআউট</a>
+  <div id="notice" class="tab-content">
+    <input type="text" id="nTitle" placeholder="নোটিসের শিরোনাম">
+    <textarea id="nMsg" rows="5" placeholder="নোটিসের মেসেজ লিখো..."></textarea>
+    <select id="nType">
+      <option value="info">ইনফো</option>
+      <option value="success">সাকসেস</option>
+      <option value="warning">সতর্কতা</option>
+      <option value="danger">জরুরি</option>
+    </select>
+    <button onclick="pushNotice()">নোটিস পুশ করুন</button>
+  </div>
+
+  <div class="logout" onclick="location.reload()">লগআউট</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="config.js"></script>
 <script>
-const MAIN_ADMIN = { username: "MdEad0", password: "admin12345" };
-const MAIN_PIN = "112233";
+const MAIN = {user:"MdEad0", pass:"admin12345", pin:"112233"};
 
 function adminLogin(){
-  const user = document.getElementById('adminUser').value.trim();
-  const pass = document.getElementById('adminPass').value;
-
-  if(user === MAIN_ADMIN.username && pass === MAIN_ADMIN.password){
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('pinBox').style.display = 'block';
-    localStorage.setItem('mainAdminLoggedIn', 'true');
-  } else {
-    alert("ভুল ইউজারনেম বা পাসওয়ার্ড!");
-  }
+  if(document.getElementById('adminUser').value===MAIN.user && document.getElementById('adminPass').value===MAIN.pass){
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('pinBox').style.display='block';
+  }else alert("ভুল ইউজারনেম বা পাসওয়ার্ড!");
 }
-
 function checkPin(){
-  if(document.getElementById('adminPin').value === MAIN_PIN){
-    document.getElementById('pinBox').style.display = 'none';
-    document.getElementById('mainPanel').style.display = 'block';
-    localStorage.setItem('adminLoggedIn','true');
-    loadData();
-  } else {
-    alert("ভুল পিন! আবার চেষ্টা করো।");
+  if(document.getElementById('adminPin').value===MAIN.pin){
+    document.getElementById('pinBox').style.display='none';
+    document.getElementById('mainPanel').style.display='block';
+    loadAll();
+  }else alert("ভুল পিন!");
+}
+
+function openTab(t){
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById(t).classList.add('active');
+  document.querySelector(`button[onclick="openTab('${t}')"]`).classList.add('active');
+}
+
+async function loadAll(){
+  try {
+    const u = await db.listDocuments(DB,'users');
+    document.getElementById('totalUsers').innerText = u.total;
+    document.getElementById('premiumUsers').innerText = u.documents.filter(x=>x.is_premium).length;
+
+    const d = await db.listDocuments(DB,'deposits',[Appwrite.Query.equal('status','pending')]);
+    document.getElementById('pendingDep').innerText = d.total; loadDep(d.documents);
+
+    const w = await db.listDocuments(DB,'withdraw_requests',[Appwrite.Query.equal('status','pending')]);
+    document.getElementById('pendingWd').innerText = w.total; loadWd(w.documents);
+
+    const t = await db.listDocuments(DB,'regular_submissions',[Appwrite.Query.equal('status','pending')]);
+    document.getElementById('pendingTask').innerText = t.total; loadTask(t.documents);
+
+    loadUsers(u.documents);
+  } catch(e) { alert("ডাটা লোড করতে সমস্যা!"); }
+}
+
+function loadUsers(list){
+  let h='<table><tr><th>নাম</th><th>ইউজারনেম</th><th>ব্যালেন্স</th><th>অ্যাকশন</th></tr>';
+  list.forEach(u=>{
+    const total = (u.task_balance||0)+(u.random_balance||0)+(u.refer_balance||0)+(u.premium_balance||0);
+    h+=`<tr><td>\( {u.first_name}</td><td> \){u.username}</td><td>\( {total}</td><td><button class="btn-reject btn-small" onclick="banUser(' \){u.$id}')">ব্যান</button></td></tr>`;
+  });
+  document.getElementById('userList').innerHTML = h+'</table>';
+}
+
+function loadDep(list){
+  let h='<table><tr><th>ইউজার</th><th>টাকা</th><th>HQ</th><th>TrxID</th><th>প্রুফ</th><th>অ্যাকশন</th></tr>';
+  list.forEach(d=>{
+    h+=`<tr><td>\( {d.user_id}</td><td> \){d.taka}</td><td>\( {d.hq}</td><td> \){d.trxid}</td><td><a href="\( {d.proof_link}" target="_blank">দেখো</a></td><td><button class="btn-approve btn-small" onclick="approveDep(' \){d.\( id}',' \){d.user_id}',\( {d.hq})">Approve</button> <button class="btn-reject btn-small" onclick="rejectDep(' \){d.$id}')">Reject</button></td></tr>`;
+  });
+  document.getElementById('depList').innerHTML = h||'কোনো পেন্ডিং নাই';
+}
+
+async function approveDep(id,user,hq){
+  if(confirm("Approve করবেন?")){
+    await db.updateDocument(DB,'deposits',id,{status:'approved'});
+    const userDoc = await db.getDocument(DB,'users',user);
+    await db.updateDocument(DB,'users',user,{deposit_balance:userDoc.deposit_balance+hq});
+    alert("Approved! HQ যোগ হয়েছে।");
+    loadAll();
+  }
+}
+async function rejectDep(id){
+  if(confirm("Reject করবেন?")){
+    await db.updateDocument(DB,'deposits',id,{status:'rejected'});
+    alert("Rejected!");
+    loadAll();
   }
 }
 
-// অটো লগইন (পরেরবার সরাসরি ঢুকবে)
-if(localStorage.getItem('mainAdminLoggedIn') === 'true' && localStorage.getItem('adminLoggedIn') === 'true'){
-  document.getElementById('loginBox').style.display = 'none';
-  document.getElementById('pinBox').style.display = 'none';
-  document.getElementById('mainPanel').style.display = 'block';
-  setTimeout(loadData, 400);
-}
+// অন্যান্য ফিচার (উইথড্র, টাস্ক, নোটিস) পরে যোগ করতে পারো
 
-function loadData(){
-  updateStats();
-  loadSubAdmins();
-}
-
-function updateStats(){
-  const users = JSON.parse(localStorage.getItem('allUsers') || '[]');
-  const subAdmins = JSON.parse(localStorage.getItem('subAdmins') || '[]');
-  
-  document.getElementById('totalUsers').innerText = users.length;
-  document.getElementById('totalSubAdmins').innerText = subAdmins.length;
-
-  // আজকের নিবন্ধন
-  const today = new Date().toISOString().slice(0,10);
-  const todayUsers = users.filter(u => u.joinDate?.includes(today)).length;
-  document.getElementById('todayUsers').innerText = todayUsers;
-}
-
-function createSubAdmin(){
-  const name = document.getElementById('saName').value.trim();
-  const username = document.getElementById('saUsername').value.trim();
-  const pass = document.getElementById('saPass').value;
-
-  if(!name || !username || !pass) return alert("সব ফিল্ড পূরণ করো!");
-
-  const permissions = {
-    users: document.getElementById('p_users').checked,
-    tasks: document.getElementById('p_tasks').checked,
-    notice: document.getElementById('p_notice').checked,
-    finance: document.getElementById('p_finance').checked,
-    logs: document.getElementById('p_logs').checked
-  };
-
-  let subAdmins = JSON.parse(localStorage.getItem('subAdmins') || '[]');
-  if(subAdmins.find(s => s.username === username)) return alert("এই ইউজারনেম আগে থেকে আছে!");
-
-  subAdmins.push({
-    name, username, password: pass, permissions, 
-    created: new Date().toLocaleString('bn-BD')
-  });
-
-  localStorage.setItem('subAdmins', JSON.stringify(subAdmins));
-  alert("সাব-এডমিন সফলভাবে তৈরি করা হয়েছে!");
-  loadSubAdmins();
-
-  // ক্লিয়ার ফর্ম
-  document.getElementById('saName').value = '';
-  document.getElementById('saUsername').value = '';
-  document.getElementById('saPass').value = '';
-  document.querySelectorAll('#subadmin input[type=checkbox]').forEach(c => c.checked = false);
-}
-
-function loadSubAdmins(){
-  const subAdmins = JSON.parse(localStorage.getItem('subAdmins') || '[]');
-  document.getElementById('totalSubAdmins').innerText = subAdmins.length;
-
-  let html = '';
-  subAdmins.forEach((sa, i) => {
-    const permList = Object.keys(sa.permissions)
-      .filter(key => sa.permissions[key])
-      .join(', ') || 'কোনো ক্ষমতা নেই';
-
-    html += `
-      <div class="subadmin-card">
-        <strong>\( {sa.name}</strong> <small>(@ \){sa.username})</small><br>
-        <small>তৈরি: ${sa.created}</small><br><br>
-        <b>ক্ষমতা:</b> ${permList}<br>
-        <button onclick="deleteSubAdmin(${i})" style="background:#ff4444;margin-top:12px;padding:10px 20px">ডিলিট করুন</button>
-      </div>`;
-  });
-
-  document.getElementById('subAdminList').innerHTML = html || '<p style="text-align:center;color:#666">কোনো সাব-এডমিন তৈরি করা হয়নি</p>';
-}
-
-function deleteSubAdmin(index){
-  if(confirm('নিশ্চিত? এই সাব-এডমিন মুছে ফেলবেন?')){
-    let subAdmins = JSON.parse(localStorage.getItem('subAdmins') || '[]');
-    subAdmins.splice(index, 1);
-    localStorage.setItem('subAdmins', JSON.stringify(subAdmins));
-    loadSubAdmins();
-  }
-}
-
-function openTab(tabName){
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabName).classList.add('active');
-  document.querySelector(`button[onclick="openTab('${tabName}')"]`).classList.add('active');
-}
-
-function logout(){
-  localStorage.removeItem('mainAdminLoggedIn');
-  localStorage.removeItem('adminLoggedIn');
-  location.reload();
-}
+loadAll();
 </script>
 </body>
 </html>

@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <title>রেগুলার টাক্স - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial;color:#fff;min-height:100vh;position:relative;overflow:hidden}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;position:relative;overflow:hidden;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.7}
     .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 6px 20px rgba(0,212,255,0.6)}
     .drawer{position:fixed;top:0;left:-300px;width:280px;height:100%;background:rgba(255,255,255,0.98);border-right:5px solid #00d4ff;transition:0.4s;z-index:9999;padding:80px 20px 20px;overflow-y:auto}
     .drawer a{display:block;padding:18px 20px;color:#00d4ff;font-size:19px;font-weight:bold;text-decoration:none;border-bottom:1px solid #eee}
     .drawer a:hover{background:#00d4ff;color:#fff}
     .close-btn{position:absolute;top:15px;right:15px;font-size:35px;cursor:pointer;color:#00d4ff}
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;z-index:9998}
-    .admin-link{background:#ff3300 !important;color:#fff !important}
     .header{background:#00d4ff;color:#fff;padding:22px;text-align:center;font-size:27px;font-weight:bold}
     .container{max-width:520px;margin:15px auto;padding:15px}
     .task-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:20px;padding:25px;margin:18px 0;box-shadow:0 15px 40px rgba(0,212,255,0.4);border:2px solid #00d4ff;color:#333}
@@ -31,11 +31,10 @@
 </head>
 <body>
 
-<!-- লাইভ স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
 <div class="menu-btn" onclick="openDrawer()">Menu</div>
-<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">×</div><div id="drawerLinks"></div></div>
 <div class="overlay" onclick="closeDrawer()"></div>
 
 <div class="header">রেগুলার টাক্স</div>
@@ -44,55 +43,70 @@
   <div class="loading">টাস্ক লোড হচ্ছে...</div>
 </div>
 
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+checkLogin(); // লগইন না থাকলে লগইন পেজে পাঠাবে
 
-// লগইন চেক
-if(!localStorage.getItem('isLoggedIn')) location.href='login.html';
-const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+const TASKS_COL = 'regular_tasks';
+const SUB_COL = 'regular_submissions';
+
+let currentUser = null;
+
+async function init() {
+  currentUser = await getCurrentUser();
+  if (!currentUser) return;
+  loadTasks();
+}
+init();
 
 // মেনু
-function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';}
-function closeDrawer(){document.getElementById('sideDrawer').style.left='-300px';document.querySelector('.overlay').style.display='none';}
+function openDrawer(){
+  document.getElementById('sideDrawer').style.left='0';
+  document.querySelector('.overlay').style.display='block';
+}
+function closeDrawer(){
+  document.getElementById('sideDrawer').style.left='-300px';
+  document.querySelector('.overlay').style.display='none';
+}
+document.getElementById('drawerLinks').innerHTML = `
+  <a href="dashboard.html">ড্যাশবোর্ড</a>
+  <a href="random-tasks.html">র‍্যান্ডম টাক্স</a>
+  <a href="regular-tasks.html">রেগুলার টাক্স</a>
+  <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
+  <a href="refer.html">রেফার করুন</a>
+  <a href="withdraw.html">উইথড্র</a>
+  <a href="#" onclick="logout()" style="color:#c00">লগআউট</a>
+`;
 
-const links = document.getElementById('drawerLinks');
-let menu = `<a href="dashboard.html">ড্যাশবোর্ড</a>
-            <a href="random-tasks.html">র‍্যান্ডম টাক্স</a>
-            <a href="regular-tasks.html">রেগুলার টাক্স</a>
-            <a href="premium-tasks.html">প্রিমিয়াম টাক্স</a>
-            <a href="refer.html">রেফার করুন</a>
-            <a href="withdraw.html">উইথড্র</a>`;
-if(localStorage.getItem('isAdmin')==='true') menu += `<a href="admin.html" class="admin-link">Admin Panel</a>`;
-menu += `<a href="#" onclick="localStorage.clear();location.href='index.html'" style="color:#c00">লগআউট</a>`;
-links.innerHTML = menu;
-
-// টাস্ক + সাবমিশন লোড করা
 async function loadTasks() {
   try {
-    const [taskRes, subRes] = await Promise.all([
-      fetch(BASE_URL + "/regular_tasks"),           // তোমার Xano-তে regular_tasks টেবিল থাকলে
-      fetch(BASE_URL + "/regular_submissions?user_id=" + user.id)
+    const [tasksRes, subsRes] = await Promise.all([
+      db.listDocuments(DATABASE_ID, TASKS_COL),
+      db.listDocuments(DATABASE_ID, SUB_COL, [
+        Appwrite.Query.equal('user_id', currentUser.$id)
+      ])
     ]);
 
-    const tasks = await taskRes.json();
-    const mySubs = await subRes.json();
+    const tasks = tasksRes.documents;
+    const mySubs = subsRes.documents;
 
     const container = document.getElementById('taskContainer');
     container.innerHTML = '';
 
-    if(tasks.length === 0){
+    if (tasks.length === 0) {
       container.innerHTML = '<div class="task-card" style="text-align:center;color:#aaa">কোনো টাস্ক নেই। শীঘ্রই যোগ করা হবে!</div>';
       return;
     }
 
     tasks.forEach(task => {
-      const userSub = mySubs.find(s => s.task_id === task.id);
+      const userSub = mySubs.find(s => s.task_id === task.$id);
       let statusHTML = '';
 
-      if(userSub){
-        if(userSub.status === 'pending') statusHTML = `<div class="status pending">পেন্ডিং – চেক হচ্ছে...</div>`;
-        if(userSub.status === 'approved') statusHTML = `<div class="status approved">এপ্রুভড! +${task.reward} HQ যোগ হয়েছে</div>`;
-        if(userSub.status === 'rejected') statusHTML = `<div class="status rejected">রিজেক্টেড – আবার চেষ্টা করো</div>`;
+      if (userSub) {
+        if (userSub.status === 'pending') statusHTML = `<div class="status pending">পেন্ডিং – চেক হচ্ছে...</div>`;
+        if (userSub.status === 'approved') statusHTML = `<div class="status approved">এপ্রুভড! +${task.reward} HQ যোগ হয়েছে</div>`;
+        if (userSub.status === 'rejected') statusHTML = `<div class="status rejected">রিজেক্টেড – আবার চেষ্টা করো</div>`;
       }
 
       container.innerHTML += `
@@ -101,69 +115,55 @@ async function loadTasks() {
           <div class="reward">পুরস্কার: ${task.reward} HQ</div>
           ${statusHTML}
           ${!userSub || userSub.status === 'rejected' ? `
-            <input type="text" class="input-box" placeholder="প্রুফ লিংক / স্ক্রিনশট লিংক দাও" id="proof-${task.id}">
-            <button class="btn-submit" onclick="submitTask(\( {task.id}, ' \){task.title}', ${task.reward})">
+            <input type="text" class="input-box" placeholder="প্রুফ লিংক দাও (Imgur/Drive)" id="proof-${task.$id}">
+            <button class="btn-submit" onclick="submitTask('${task.\( id}',' \){task.title}',${task.reward})">
               সাবমিট করুন
             </button>
-          ` : ''}
+          ` : '<p style="text-align:center;color:#666">তুমি ইতিমধ্যে সাবমিট করেছো</p>'}
         </div>
       `;
     });
-  } catch(e) {
-    document.getElementById('taskContainer').innerHTML = '<div class="task-card" style="text-align:center;color:#f00">ইন্টারনেট সমস্যা! আবার রিফ্রেশ করো।</div>';
+  } catch (e) {
+    document.getElementById('taskContainer').innerHTML = '<div class="task-card" style="text-align:center;color:#f00">ইন্টারনেট সমস্যা!</div>';
   }
 }
 
 async function submitTask(taskId, title, reward) {
   const proof = document.getElementById('proof-'+taskId).value.trim();
-  if(!proof) return alert('প্রুফ লিংক দাও!');
+  if (!proof) return showNotification('প্রুফ লিংক দাও!', 'error');
 
   try {
-    const res = await fetch(BASE_URL + "/submit_regular_task", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        user_id: user.id,
-        username: user.username,
-        task_id: taskId,
-        task_title: title,
-        proof_link: proof,
-        reward: reward
-      })
+    await db.createDocument(DATABASE_ID, SUB_COL, 'unique()', {
+      user_id: currentUser.$id,
+      username: currentUser.username,
+      task_id: taskId,
+      task_title: title,
+      proof_link: proof,
+      reward: reward,
+      status: 'pending'
     });
 
-    const data = await res.json();
-    if(res.ok){
-      alert('সাবমিট সফল! এডমিন চেক করে HQ যোগ করবে।');
-      loadTasks();
-    } else {
-      alert(data.message || 'কিছু ভুল হয়েছে!');
-    }
-  } catch(e) {
-    alert('ইন্টারনেট সমস্যা!');
+    showNotification('সাবমিট সফল! এডমিন চেক করে HQ যোগ করবে', 'success');
+    loadTasks();
+  } catch (e) {
+    showNotification('সমস্যা: ' + e.message, 'error');
   }
 }
 
-loadTasks();
-
-// লাইভ স্পেস ব্যাকগ্রাউন্ড (একই সব পেজে)
+// স্পেস ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-const stars = []; for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
+const stars = [];
+for(let i=0;i<1000;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*2,speed:Math.random()*0.8+0.2});
 let nebulaAngle = 0;
-const planet = {x:w*0.75,y:h*0.25,radius:90};
-
 function draw(){
   ctx.fillStyle='rgba(0,0,20,0.04)'; ctx.fillRect(0,0,w,h);
   ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(nebulaAngle);
   const g=ctx.createRadialGradient(0,0,0,0,0,700);
-  g.addColorStop(0,'rgba(120,0,255,0.35)'); g.addColorStop(0.5,'rgba(80,0,200,0.2)'); g.addColorStop(1,'transparent');
+  g.addColorStop(0,'rgba(0,212,255,0.4)'); g.addColorStop(1,'transparent');
   ctx.fillStyle=g; ctx.fillRect(-1000,-1000,2000,2000); ctx.restore(); nebulaAngle+=0.0005;
-  const pg=ctx.createRadialGradient(planet.x,planet.y,planet.radius*0.3,planet.x,planet.y,planet.radius);
-  pg.addColorStop(0,'#ccc'); pg.addColorStop(0.7,'#666'); pg.addColorStop(1,'#222');
-  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.radius,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x-=s.speed;if(s.x<0)s.x=w;});
   requestAnimationFrame(draw);
 }

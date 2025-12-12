@@ -4,80 +4,53 @@
   <meta charset="utf-8">
   <title>ড্যাশবোর্ড - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
-
-    /* মেনু */
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative;background:#0a001f}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.8}
     .menu-btn{position:fixed;top:15px;left:15px;background:#00d4ff;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;z-index:9999;box-shadow:0 12px 40px rgba(0,212,255,0.7);backdrop-filter:blur(15px);border:4px solid rgba(255,255,255,0.3);animation:pulse 4s infinite}
     @keyframes pulse{0%,100%{box-shadow:0 12px 40px rgba(0,212,255,0.7)}50%{box-shadow:0 20px 60px rgba(0,212,255,1)}}
-    .drawer{position:fixed;top:0;left:-320px;width:300px;height:100%;background:rgba(255,255,255,0.98);border-right:6px solid #00d4ff;transition:0.5s cubic-bezier(0.68,-0.55,0.27,1.55);z-index:9999;padding:90px 20px 30px;overflow-y:auto;box-shadow:10px 0 60px rgba(0,0,0,0.7)}
+    .drawer{position:fixed;top:0;left:-320px;width:300px;height:100%;background:rgba(255,255,255,0.98);border-right:6px solid #00d4ff;transition:0.5s;z-index:9999;padding:90px 20px 30px;overflow-y:auto;box-shadow:10px 0 60px rgba(0,0,0,0.7)}
     .drawer a{display:block;padding:20px 25px;color:#00aaff;font-size:20px;font-weight:900;text-decoration:none;border-bottom:1px solid #eee;border-radius:15px;margin:10px;transition:0.4s}
     .drawer a:hover{background:#00d4ff;color:#fff;transform:translateX(15px);box-shadow:0 10px 30px rgba(0,212,255,0.5)}
     .close-btn{position:absolute;top:18px;right:18px;font-size:45px;cursor:pointer;color:#00d4ff;background:#fff;width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(0,0,0,0.4)}
-
-    /* হেডার */
     .header{background:linear-gradient(135deg,#00d4ff,#8b3dff);padding:35px 20px;text-align:center;font-size:36px;font-weight:900;box-shadow:0 15px 50px rgba(0,0,0,0.6);position:relative;overflow:hidden}
     .header::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:rgba(255,255,255,0.1);transform:rotate(30deg);animation:shine 8s infinite}
     @keyframes shine{0%{transform:translateX(-100%) translateY(-100%) rotate(30deg)}100%{transform:translateX(100%) translateY(100%) rotate(30deg)}}
-
-    .container{max-width:580px;margin:25ISIS auto;padding:20px}
-
-    /* ওয়েলকাম */
+    .container{max-width:580px;margin:25px auto;padding:20px}
     .welcome{text-align:center;margin:30px 0}
     .welcome h1{font-size:34px;margin-bottom:8px}
     .welcome p{font-size:20px;opacity:0.9}
-
-    /* ব্যালেন্স বক্স */
     .balance-box{background:linear-gradient(135deg,#8b3dff,#00d4ff);padding:40px;border-radius:30px;margin:30px 0;box-shadow:0 25px 70px rgba(139,61,255,0.6);text-align:center;border:5px solid rgba(255,255,255,0.3)}
     .balance-box h2{font-size:48px;font-weight:900;margin:15px 0;letter-spacing:2px}
     .balance-box p{font-size:20px}
-
-    /* গ্রিড */
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:30px 0}
     .btn-box{background:rgba(255,255,255,0.15);padding:35px;border-radius:25px;text-align:center;cursor:pointer;transition:0.5s;backdrop-filter:blur(15px);border:3px solid transparent}
     .btn-box:hover{transform:translateY(-15px) scale(1.05);background:rgba(255,255,255,0.3);border-color:#00d4ff;box-shadow:0 25px 60px rgba(0,212,255,0.5)}
     .btn-box i{font-size:50px;margin-bottom:18px;display:block}
     .btn-box span{font-size:19px;font-weight:900;display:block}
-
-    /* স্ট্যাটস */
     .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:30px 0}
     .stat{background:rgba(255,255,255,0.15);padding:25px;border-radius:22px;text-align:center;backdrop-filter:blur(10px)}
     .stat h3{font-size:32px;font-weight:900;margin:12px 0}
     .stat p{font-size:16px;opacity:0.9}
-
-    /* প্রিমিয়াম ব্যাজ */
     .premium-badge{background:#ff1744;color:#fff;padding:12px 28px;border-radius:50px;font-size:18px;font-weight:900;display:inline-block;margin-top:15px;box-shadow:0 10px 30px rgba(255,23,68,0.5)}
-
-    /* নোটিস বোর্ড */
-    #noticeBoard{position:fixed;top:90px;left:50%;transform:translateX(-50%);z-index:9999;max-width:92%;width:520px;display:none}
-    .notice{background:#fff;color:#222;padding:25px;border-radius:20px;margin:15px 0;box-shadow:0 20px 50px rgba(0,0,0,0.6);border-left:8px solid #2196f3;position:relative;animation:pop 0.6s}
-    .notice.success{border-left-color:#4caf50}.notice.warning{border-left-color:#ff9800}.notice.danger{border-left-color:#f44336}
-    @keyframes pop{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
-    .notice h3{font-size:22px;margin-bottom:12px}
-    .notice small{color:#777;float:right}
-    .notice button{position:absolute;top:15px;right:15px;background:none;border:none;font-size:32px;cursor:pointer;color:#999}
   </style>
 </head>
 <body>
 
-<!-- স্পেস ব্যাকগ্রাউন্ড -->
 <canvas id="spaceBg"></canvas>
 
-<div class="menu-btn" onclick="openDrawer()">Menu</div>
-<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeDrawer()">X</div><div id="drawerLinks"></div></div>
-<div class="overlay" onclick="closeDrawer()"></div>
-
-<!-- নোটিস বোর্ড -->
-<div id="noticeBoard"><div id="noticeList"></div></div>
+<div class="menu-btn" onclick="openMenu()">Menu</div>
+<div class="drawer" id="sideDrawer"><div class="close-btn" onclick="closeMenu()">×</div><div id="drawerLinks"></div></div>
+<div class="overlay" onclick="closeMenu()"></div>
 
 <div class="header">Income White HQ</div>
 
 <div class="container">
   <div class="welcome">
     <h1>স্বাগতম, <span id="userName">...</span>!</h1>
-    <p>আজ: <span id="todayDate">loading...</span></p>
+    <p>আজ: <span id="todayDate">...</span></p>
     <div id="premiumStatus"></div>
   </div>
 
@@ -101,25 +74,59 @@
     <div class="stat"><h3 id="totalEarned">0</h3><p>মোট আয়</p></div>
   </div>
 
-  <div style="text-align:center;margin:30px 0">
-    <button onclick="location.href='packages.html'" style="background:#ff9800;color:#fff;padding:20px 40px;border:none;border-radius:20px;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 15px 40px rgba(255,152,0,0.6)">
+  <div style="text-align:center;margin:40px 0">
+    <button onclick="location.href='packages.html'" style="background:#ff9800;color:#fff;padding:22px 50px;border:none;border-radius:22px;font-size:24px;font-weight:900;cursor:pointer;box-shadow:0 15px 40px rgba(255,152,0,0.6);transition:0.3s">
       প্রিমিয়াম প্যাকেজ কিনুন
     </button>
   </div>
 </div>
 
+<script src="config.js"></script>
+<script src="functions.js"></script>
 <script>
-const BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:wsicKubT";
+checkLogin();
 
-if(!localStorage.getItem('isLoggedIn')) { alert('লগইন করুন!'); location.href='login.html'; }
-const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+let currentUser = null;
 
-// তারিখ
-document.getElementById('todayDate').innerText = new Date().toLocaleDateString('bn-BD',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+async function init() {
+  currentUser = await getCurrentUser();
+  if (!currentUser) return;
+
+  // তারিখ
+  document.getElementById('todayDate').innerText = new Date().toLocaleDateString('bn-BD', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  // নাম
+  document.getElementById('userName').innerText = (currentUser.first_name || '') + ' ' + (currentUser.last_name || '');
+
+  // মেইন ব্যালেন্স
+  const mainBal = (currentUser.task_balance || 0) +
+                  (currentUser.random_balance || 0) +
+                  (currentUser.refer_balance || 0) +
+                  (currentUser.premium_balance || 0);
+  document.getElementById('mainBalance').innerText = mainBal.toLocaleString();
+
+  // রেফার কাউন্ট
+  try {
+    const referRes = await db.listDocuments(DATABASE_ID, COL.users, [
+      Appwrite.Query.equal('refer_by', currentUser.username)
+    ]);
+    document.getElementById('totalRefer').innerText = referRes.total;
+    document.getElementById('totalEarned').innerText = mainBal.toLocaleString();
+  } catch (e) {}
+
+  // প্রিমিয়াম স্ট্যাটাস
+  if (currentUser.is_premium && new Date(currentUser.premium_expiry) > new Date()) {
+    const pkgName = {1000:"সিলভার",5000:"গোল্ড",10000:"ডায়মন্ড",30000:"প্লাটিনাম",50000:"এলিট",100000:"লিজেন্ড"}[currentUser.premium_package] || "প্রিমিয়াম";
+    document.getElementById('premiumStatus').innerHTML = `<div class="premium-badge">প্রিমিয়াম • \( {pkgName} • মেয়াদ: \){new Date(currentUser.premium_expiry).toLocaleDateString('bn-BD')} পর্যন্ত</div>`;
+  } else {
+    document.getElementById('premiumStatus').innerHTML = '<p style="color:#ff9800;font-size:20px">ফ্রি ইউজার</p>';
+  }
+}
+init();
 
 // মেনু
-function openDrawer(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';document.body.style.overflow='hidden';}
-function closeDrawer(){document.getElementById('sideDrawer').style.left='-320px';document.querySelector('.overlay').style.display='none';document.body.style.overflow='auto';}
+function openMenu(){document.getElementById('sideDrawer').style.left='0';document.querySelector('.overlay').style.display='block';document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('sideDrawer').style.left='-320px';document.querySelector('.overlay').style.display='none';document.body.style.overflow='auto';}
 document.getElementById('drawerLinks').innerHTML = `
   <a href="dashboard.html">ড্যাশবোর্ড</a>
   <a href="random-tasks.html">Random Tasks</a>
@@ -131,51 +138,16 @@ document.getElementById('drawerLinks').innerHTML = `
   <a href="deposit.html">ডিপোজিট</a>
   <a href="withdraw.html">উইথড্র</a>
   <a href="profile.html">প্রোফাইল</a>
-  <a href="#" onclick="if(confirm('লগআউট করবেন?')){localStorage.clear();location.href='index.html'}" style="color:#c00;margin-top:30px">লগআউট</a>`;
-
-// ড্যাশবোর্ড লোড
-async function loadDashboard() {
-  try {
-    const res = await fetch(BASE_URL + "/get_user_dashboard?user_id=" + user.id);
-    const data = await res.json();
-
-    document.getElementById('userName').innerText = data.name || data.username;
-    document.getElementById('mainBalance').innerText = Number(data.main_balance || 0).toLocaleString();
-    document.getElementById('todayEarn').innerText = Number(data.today_earn || 0).toLocaleString();
-    document.getElementById('totalRefer').innerText = data.total_refer || 0;
-    document.getElementById('totalEarned').innerText = Number(data.total_earned || 0).toLocaleString();
-
-    if(data.is_premium){
-      const pkgName = {1000:"সিলভার",5000:"গোল্ড",10000:"ডায়মন্ড",30000:"প্লাটিনাম",50000:"এলিট",100000:"লিজেন্ড"}[data.premium_package] || "প্রিমিয়াম";
-      document.getElementById('premiumStatus').innerHTML = `<div class="premium-badge">প্রিমিয়াম • \( {pkgName} • মেয়াদ: \){new Date(data.premium_expiry).toLocaleDateString('bn-BD')} পর্যন্ত</div>`;
-    }
-
-    // নোটিস
-    if(data.notices && data.notices.length > 0){
-      const board = document.getElementById('noticeBoard');
-      board.style.display = 'block';
-      document.getElementById('noticeList').innerHTML = data.notices.map(n => `
-        <div class="notice ${n.type}">
-          <h3>${n.title}</h3>
-          <p>${n.message.replace(/\n/g,'<br>')}</p>
-          <small>${new Date(n.created_at).toLocaleString('bn-BD')}</small>
-          <button onclick="this.parentElement.style.display='none'">X</button>
-        </div>`).join('');
-    }
-
-  } catch(e) {
-    document.getElementById('mainBalance').innerText = "ইন্টারনেট সমস্যা";
-  }
-}
-
-loadDashboard();
+  <a href="#" onclick="logout()" style="color:#c00;margin-top:30px">লগআউট</a>
+`;
 
 // স্পেস ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-const stars = []; for(let i=0;i<1800;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*3,speed:Math.random()*1.5+0.5});
+const stars = [];
+for(let i=0;i<1800;i++) stars.push({x:Math.random()*w,y:Math.random()*h,size:Math.random()*3,speed:Math.random()*1.5+0.5});
 let nebulaAngle = 0;
 const planet = {x:w*0.78,y:h*0.22,radius:130};
 

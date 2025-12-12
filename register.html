@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>রেজিস্ট্রেশন - Income White HQ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%;min-height:100vh;background:#0a001f;font-family:'Segoe UI',Arial,sans-serif;color:#fff;overflow-x:hidden}
@@ -17,7 +18,7 @@
     button{background:linear-gradient(135deg,#00d4ff,#00ff9d);color:#000;padding:20px;border:none;border-radius:18px;width:100%;font-size:20px;font-weight:900;margin-top:25px;cursor:pointer;box-shadow:0 12px 35px rgba(0,212,255,0.5);transition:0.4s}
     button:hover{transform:translateY(-5px)}
     button:disabled{background:#555;cursor:not-allowed}
-    .error{color:#ff3366;text-align:center;margin:15px 0;font-weight:bold;font-size:17px;padding:12px;background:rgba(255,51,102,0.15);border-radius:12px;border:1px solid #ff3366}
+    .error{color:#ff3366;text-align:center;margin:15px 0;font-weight:bold;font-size:17px;padding:12px;background:rgba(255,51,102,0.15);border-radius:12px;border:1px solid #ff3366;display:none}
     .login-link{text-align:center;margin-top:20px;font-size:16px}
     .login-link a{color:#00d4ff;font-weight:bold;text-decoration:none}
     .popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
@@ -36,11 +37,11 @@
 
     <input type="text" id="firstName" placeholder="ফার্স্ট নেম *" required>
     <input type="text" id="lastName" placeholder="লাস্ট নেম *" required>
-    <input type="text" id="phone" placeholder="মোবাইল নাম্বার (017...) *" maxlength="11" required>
-    <input type="text" id="username" placeholder="ইউজারনেম (ইউনিক) *" required>
+    <input type="text" id="phone" placeholder="মোবাইল (017...)" maxlength="11" required>
+    <input type="text" id="username" placeholder="ইউজারনেম (ইউনিক)" required>
     <input type="email" id="email" placeholder="ইমেইল (অপশনাল)">
-    <input type="password" id="pass" placeholder="পাসওয়ার্ড (৬+ অক্ষর) *" minlength="6" required>
-    <input type="password" id="cpass" placeholder="কনফার্ম পাসওয়ার্ড *" required>
+    <input type="password" id="pass" placeholder="পাসওয়ার্ড (৬+ অক্ষর)" minlength="6" required>
+    <input type="password" id="cpass" placeholder="কনফার্ম পাসওয়ার্ড" required>
     <input type="text" id="refCode" placeholder="রেফার কোড (অপশনাল) → ১০০ HQ বোনাস" readonly>
 
     <button id="regBtn" onclick="register()">রেজিস্টার করুন</button>
@@ -54,29 +55,19 @@
 <!-- সাকসেস পপআপ -->
 <div class="popup" id="success">
   <div class="popbox">
-    <h3 style="color:#00d4ff;">অভিনন্দন!<br>রেজিস্ট্রেশন সফল!</h3>
-    <p style="margin-bottom:15px;">তোমার লগইন তথ্য:</p>
+    <h3 style="color:#00d4ff">অভিনন্দন!<br>রেজিস্ট্রেশন সফল!</h3>
+    <p style="margin-bottom:15px">তোমার লগইন তথ্য:</p>
     <div class="link" id="loginInfo"></div>
-    <p style="margin:25px 0 15px;">তোমার রেফার লিংক:</p>
+    <p style="margin:25px 0 15px">তোমার রেফার লিংক:</p>
     <div class="link" id="myRefLink"></div>
-    <button onclick="copyLink()" style="background:#00d4ff;color:#fff;padding:14px;border-radius:12px;margin:10px;font-weight:bold;">রেফার লিংক কপি করুন</button>
-    <button onclick="goDashboard()" style="background:#8b3dff;color:#fff;padding:18px;border-radius:15px;margin-top:15px;font-weight:900;">ড্যাশবোর্ডে যান</button>
+    <button onclick="copyLink()" style="background:#00d4ff;color:#fff;padding:14px;border-radius:12px;margin:10px;font-weight:bold">রেফার লিংক কপি করুন</button>
+    <button onclick="goDashboard()" style="background:#8b3dff;color:#fff;padding:18px;border-radius:15px;margin-top:15px;font-weight:900">ড্যাশবোর্ডে যান</button>
   </div>
 </div>
 
-<!-- Appwrite SDK -->
 <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="config.js"></script>
 <script>
-const client = new Appwrite.Client();
-client
-    .setEndpoint('https://sgp.cloud.appwrite.io/v1')
-    .setProject('6931024b0037bd66bcb4');
-
-const databases = new Appwrite.Databases(client);
-const DATABASE_ID = 'main';
-const COLLECTION_ID = 'users';
-
-// রেফার কোড URL থেকে লোড
 const urlParams = new URLSearchParams(window.location.search);
 const urlRef = urlParams.get('ref');
 if (urlRef) document.getElementById('refCode').value = urlRef.toLowerCase();
@@ -84,7 +75,7 @@ if (urlRef) document.getElementById('refCode').value = urlRef.toLowerCase();
 async function register() {
   const msg = document.getElementById('msg');
   const btn = document.getElementById('regBtn');
-  msg.innerHTML = '';
+  msg.style.display = 'none';
   btn.disabled = true;
   btn.innerText = 'রেজিস্টার হচ্ছে...';
 
@@ -92,68 +83,88 @@ async function register() {
   const lastName = document.getElementById('lastName').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const username = document.getElementById('username').value.trim().toLowerCase();
-  const email = document.getElementById('email').value.trim();
+  const email = document.getElementById('email').value.trim() || null;
   const pass = document.getElementById('pass').value;
   const cpass = document.getElementById('cpass').value;
   const refer_by = document.getElementById('refCode').value.trim() || null;
 
   if (!firstName || !lastName || !phone || !username || !pass || !cpass) {
-    msg.innerHTML = 'সব * চিহ্নিত ফিল্ড পূরণ করো!';
+    msg.innerText = 'সব * চিহ্নিত ফিল্ড পূরণ করো!'; msg.style.display = 'block';
     btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return;
   }
-  if (pass !== cpass) { msg.innerHTML = 'পাসওয়ার্ড মিলছে না!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
-  if (pass.length < 6) { msg.innerHTML = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
-  if (!/^01[0-9]{9}$/.test(phone)) { msg.innerHTML = 'সঠিক ১১ ডিজিটের নাম্বার দাও!'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
+  if (pass !== cpass) { msg.innerText = 'পাসওয়ার্ড মিলছে না!'; msg.style.display = 'block'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
+  if (pass.length < 6) { msg.innerText = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর!'; msg.style.display = 'block'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
+  if (!/^01[3-9][0-9]{8}$/.test(phone)) { msg.innerText = 'সঠিক ১১ ডিজিটের নাম্বার দাও!'; msg.style.display = 'block'; btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return; }
 
   try {
     // ডুপ্লিকেট চেক
-    const check = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+    const check = await db.listDocuments(DATABASE_ID, COL.users, [
       Appwrite.Query.or([
         Appwrite.Query.equal('username', username),
         Appwrite.Query.equal('phone', phone)
       ])
     ]);
     if (check.total > 0) {
-      msg.innerHTML = 'ইউজারনেম বা ফোন নাম্বার আগে থেকে আছে!';
-      btn.disabled = false; btn.innerText = 'রেজিস্টার করুন'; return;
+      msg.innerText = 'ইউজারনেম বা ফোন নাম্বার আগে থেকে আছে!';
+      msg.style.display = 'block';
+      btn.disabled = false; btn.innerText = 'রেজিস্টার করুন';
+      return;
+    }
+
+    // রেফার চেক
+    let referBonus = 50;
+    if (refer_by) {
+      const refCheck = await db.listDocuments(DATABASE_ID, COL.users, [Appwrite.Query.equal('username', refer_by)]);
+      if (refCheck.total === 0) {
+        msg.innerText = 'রেফার কোড ভুল!'; msg.style.display = 'block';
+        btn.disabled = false; btn.innerText = 'রেজিস্টার করুন';
+        return;
+      }
+      referBonus = 100; // রেফার থাকলে ১০০ HQ বোনাস
     }
 
     // রেজিস্ট্রেশন
-    const user = await databases.createDocument(DATABASE_ID, COLLECTION_ID, 'unique()', {
+    const user = await db.createDocument(DATABASE_ID, COL.users, 'unique()', {
       first_name: firstName,
       last_name: lastName,
       phone,
       username,
-      email: email || null,
+      email,
       password: pass,
       refer_by: refer_by,
-      new_balance: refer_by ? 100 : 50,
-      deposit_balance: 0,
-      task_balance: 0,
+      task_balance: referBonus,
       random_balance: 0,
       refer_balance: 0,
       premium_balance: 0,
+      deposit_balance: 0,
+      is_premium: false,
       task_completed: 0,
       task_rejected: 0
     });
 
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    localStorage.setItem('isLoggedIn', 'true');
+    // রেফার বোনাস দাও
+    if (refer_by) {
+      const refUser = refCheck.documents[0];
+      await db.updateDocument(DATABASE_ID, COL.users, refUser.$id, {
+        refer_balance: (refUser.refer_balance || 0) + 100
+      });
+    }
 
-    const baseUrl = location.origin + location.pathname.split('/').slice(0, -1).join('/') + '/';
-    const referLink = `\( {baseUrl}register.html?ref= \){username}`;
+    // সাকসেস
+    const base = location.origin + location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+    const refLink = `\( {base}register.html?ref= \){username}`;
 
     document.getElementById('loginInfo').innerHTML = `
       ইউজারনেম: <b>${username}</b><br>
       পাসওয়ার্ড: <b>${pass}</b><br>
-      নাম: <b>\( {firstName} \){lastName}</b>
+      বোনাস: <b>${referBonus} HQ</b> যোগ হয়েছে!
     `;
-    document.getElementById('myRefLink').innerText = referLink;
+    document.getElementById('myRefLink').innerText = refLink;
     document.getElementById('success').style.display = 'flex';
 
   } catch (err) {
-    msg.innerHTML = err.message || 'ইন্টারনেট সমস্যা! আবার চেষ্টা করো।';
-  } finally {
+    msg.innerText = err.message || 'ইন্টারনেট সমস্যা!';
+    msg.style.display = 'block';
     btn.disabled = false;
     btn.innerText = 'রেজিস্টার করুন';
   }
@@ -161,14 +172,14 @@ async function register() {
 
 function copyLink() {
   const link = document.getElementById('myRefLink').innerText;
-  navigator.clipboard.writeText(link).then(() => alert('রেফার লিংক কপি হয়েছে!'));
+  navigator.clipboard.writeText(link).then(() => alert('কপি হয়েছে!'));
 }
 
 function goDashboard() {
   location.href = 'dashboard.html';
 }
 
-// সুন্দর ব্যাকগ্রাউন্ড
+// ব্যাকগ্রাউন্ড
 const canvas = document.getElementById('spaceBg');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
